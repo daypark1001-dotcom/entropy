@@ -1,0 +1,2641 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Park Dayoung — Graphic Motion Design Portfolio 2023–2025</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..100,500..900&family=Afacad+Flux:wght@100..1000&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css">
+<style>
+/* ========================================================
+   ENTROPY — Park Dayoung Portfolio
+   Concept: design-tool aesthetic. Bounding boxes track,
+   dots decompose, type drifts, monospace meta tickers.
+   ======================================================== */
+
+:root {
+  --bg: #d8d9e6;
+  --bg-deep: #c6c8db;
+  --ink: #0b1240;
+  --ink-soft: rgba(11, 18, 64, 0.55);
+  --ink-faint: rgba(11, 18, 64, 0.32);
+  --blue: #1f3df0;
+  --red: #ff1a1a;
+  --line: rgba(11, 18, 64, 0.16);
+  --line-soft: rgba(11, 18, 64, 0.08);
+
+  --display: 'Afacad Flux', 'Pretendard', sans-serif;
+  --display-cover: 'Archivo', 'Pretendard', sans-serif;
+  --sans: 'Pretendard', sans-serif;
+  --mono: 'Pretendard', sans-serif;
+
+  --pad: clamp(20px, 3vw, 40px);
+}
+
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+html { scroll-behavior: smooth; }
+body {
+  background: var(--bg);
+  color: var(--ink);
+  font-family: var(--sans);
+  font-size: 15px;
+  line-height: 1.45;
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+  cursor: crosshair;
+}
+a { color: inherit; text-decoration: none; }
+a, button { cursor: crosshair; }
+::selection { background: var(--blue); color: white; }
+
+/* page colour shift on scroll: a fixed layer whose opacity JS sets (compositor-only, no repaint) */
+.under-bg {
+  position: fixed; inset: 0;
+  z-index: -1;
+  background: var(--bg-deep);
+  opacity: 0;
+  pointer-events: none;
+  will-change: opacity;
+}
+
+/* Film-grain overlay */
+body::after {
+  content: '';
+  position: fixed; inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0.05 0 0 0 0 0.07 0 0 0 0 0.25 0 0 0 0.9 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  background-size: 160px 160px; /* tile it; unsized, the svg stretches to the whole layer */
+  opacity: 0.42; /* grain strength knob */
+  mix-blend-mode: multiply;
+  pointer-events: none;
+  z-index: 9999;
+}
+
+/* Ink frame around the viewport: the page reads as a rounded canvas */
+.frame {
+  position: fixed;
+  inset: clamp(6px, 0.8vw, 10px);
+  border-radius: clamp(12px, 1.6vw, 20px);
+  box-shadow: 0 0 0 40px var(--ink);
+  pointer-events: none;
+  z-index: 9998;
+}
+
+/* Design-tool readout (bottom-left): current section, Y position, progress */
+.readout {
+  position: fixed;
+  left: calc(var(--pad) + 4px);
+  bottom: calc(var(--pad) + 4px);
+  z-index: 200;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 8px 14px 8px 12px;
+  border: 1.5px solid var(--ink);
+  border-radius: 999px;
+  background: white;
+  box-shadow: 3px 3px 0 var(--ink);
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  font-variant-numeric: tabular-nums;
+  color: var(--ink-soft);
+  opacity: 0;
+  transform: translateY(12px);
+  transition: opacity 0.4s ease, transform 0.4s cubic-bezier(0.22, 1, 0.36, 1);
+  pointer-events: none;
+}
+.readout.is-on { opacity: 1; transform: none; }
+.readout b { color: var(--ink); font-weight: 700; }
+.readout b::before {
+  content: '';
+  display: inline-block;
+  width: 7px; height: 7px;
+  margin-right: 8px;
+  border-radius: 50%;
+  background: var(--red);
+  vertical-align: 1px;
+}
+.readout-bar { width: 48px; height: 3px; background: var(--line); position: relative; overflow: hidden; }
+.readout-bar i { position: absolute; inset: 0; background: var(--red); transform-origin: left; transform: scaleX(var(--p, 0)); }
+@media (max-width: 720px) { .readout-y { display: none; } }
+
+
+/* ─── Custom soft cursor (small crosshair dot) ─── */
+.cursor {
+  position: fixed;
+  top: 0; left: 0;
+  width: 18px; height: 18px;
+  pointer-events: none;
+  z-index: 10000;
+  transform: translate(-50%, -50%);
+  mix-blend-mode: difference;
+  transition: opacity 0.2s ease;
+}
+.cursor::before, .cursor::after {
+  content: '';
+  position: absolute;
+  background: white;
+}
+.cursor::before { top: 50%; left: 0; right: 0; height: 1px; transform: translateY(-50%); }
+.cursor::after  { left: 50%; top: 0; bottom: 0; width: 1px;  transform: translateX(-50%); }
+.cursor-dot {
+  position: fixed;
+  width: 24px; height: 24px;
+  background: rgba(255, 26, 26, 0.42);
+  pointer-events: none;
+  z-index: 10001;
+  transform: translate(-50%, -50%);
+  border-radius: 50%;
+  transition: transform 0.18s ease, opacity 0.2s;
+}
+
+/* ─── Page width cap (keeps the layout from stretching edge-to-edge on wide screens) ─── */
+.page {
+  max-width: 1240px;
+  margin: 0 auto;
+  position: relative;
+}
+
+/* ─── Top sticky header ─── */
+.topbar {
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  z-index: 100;
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: start;
+  padding: var(--pad);
+  font-size: 14px;
+  font-weight: 600;
+  letter-spacing: 0.005em;
+  pointer-events: none;
+  mix-blend-mode: multiply;
+}
+.topbar > * { pointer-events: auto; }
+/* lines up with the left edge of the 1240px content column (where the cover graphic starts);
+   never closer than 140px from the edge, so it clears the name on narrow screens */
+.topbar-title {
+  position: absolute;
+  top: var(--pad);
+  left: max(calc(var(--pad) + 140px), calc((100% - 1240px) / 2 + var(--pad)));
+  z-index: 100;
+  font-size: 14px;
+  font-weight: 600;
+  letter-spacing: 0.005em;
+  line-height: 1.2;
+  color: var(--ink-soft);
+}
+/* TOC, same link treatment as the nav in index.html */
+.toc {
+  display: flex;
+  justify-content: flex-end;
+  gap: 2rem;
+  line-height: 1.2;
+}
+.toc a {
+  font-size: 12px;
+  color: var(--ink);
+  text-decoration: none;
+  font-weight: 500;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  opacity: 0.6;
+  transition: opacity 0.3s;
+}
+.toc a:hover { opacity: 1; }
+/* while the dark marquee strip passes under the topbar (toggled by JS), multiply would hide the text */
+.topbar.on-dark { mix-blend-mode: normal; }
+.topbar.on-dark .topbar-name,
+.topbar.on-dark .toc a { color: #fff; }
+/* TOC jump: the divider lands at the very top and its section fills the rest of the screen */
+.divider[id] { scroll-margin-top: 0; }
+/* only the cards rise over the cover: the projects strip, filter and corner labels
+   stay hidden until the cover has nearly gone, then fade in */
+#works, .works .pfilter, .works-bg { opacity: 0; } /* JS fades them in */
+#works { background: transparent; }
+.divider[id] + section { min-height: calc(100svh - 45px); } /* 45px = divider strip height */
+/* Contact jumps to the marquee strip instead, so marquee (93px) + divider + footer fill the screen */
+.marquee-strip[id] { scroll-margin-top: 0; }
+.foot { min-height: calc(100svh - 45px - 93px); }
+.topbar-name {
+  color: var(--blue);
+  line-height: 1.2;
+  font-weight: 700;
+}
+
+/* ─── COVER ─── */
+/* the cover stays pinned while the project cards float up over it;
+   z-index 0 keeps its inner layers (title, boxes, cue) under everything that follows */
+.cover {
+  position: sticky;
+  top: 0;
+  z-index: 0;
+  transform-origin: 50% 100%;
+  will-change: transform, opacity; /* JS scales/fades it on scroll; its own layer, so the dot SVGs never repaint */
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  padding: var(--pad);
+  padding-top: calc(var(--pad) + 60px);
+}
+.cover-stage {
+  flex: 1;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 60vh;
+}
+.stage-canvas {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 16 / 8.6;
+  /* JS shifts it so the ENTROPY letters (rows staggered) sit dead centre on screen */
+  will-change: transform;
+}
+
+/* Halftone dot letter-shapes (rendered by JS into these) — sit behind the
+   title as a soft blue "print misregistration" shadow, offset down-right. */
+.dot-block {
+  position: absolute;
+  pointer-events: none;
+  z-index: 2;
+  opacity: 0.42;
+  animation: dotPulse 5s ease-in-out infinite;
+  will-change: transform, opacity;
+}
+.dot-block svg { display: block; width: 100%; height: 100%; overflow: visible; }
+.dot-block circle { fill: var(--blue); }
+
+@keyframes dotPulse {
+  0%, 100% { opacity: 0.42; }
+  50%      { opacity: 0.28; }
+}
+
+/* Seven blocks spelling ENTROPY, echoing the title's own two-row layout
+   (ENTR shifted left, OPY shifted right) but nudged down-right for the
+   drop-shadow read. */
+.dot-e { top:  6%; left:  2%; width: 19%; height: 46%; }
+.dot-n { top:  6%; left: 19%; width: 19%; height: 46%; animation-delay: -0.6s; }
+.dot-t { top:  6%; left: 36%; width: 19%; height: 46%; animation-delay: -1.2s; }
+.dot-r { top:  6%; left: 53%; width: 19%; height: 46%; animation-delay: -1.8s; }
+.dot-o { top: 50%; left: 30%; width: 19%; height: 46%; animation-delay: -2.4s; }
+.dot-p { top: 50%; left: 47%; width: 19%; height: 46%; animation-delay: -3.0s; }
+.dot-y { top: 50%; left: 64%; width: 19%; height: 46%; animation-delay: -3.6s; }
+
+/* The big ENTROPY title */
+.entropy-title {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  z-index: 5;
+  font-family: var(--display-cover);
+  font-weight: 900;
+  font-size: clamp(72px, 13.5vw, 196px);
+  line-height: 0.85;
+  letter-spacing: -0.045em;
+  color: var(--ink);
+  pointer-events: none;
+  text-shadow: 0 0 0 var(--ink);
+}
+.entropy-title .row { display: block; }
+.entropy-title .row-1 { transform: translateX(-12%); }
+.entropy-title .row-2 { transform: translateX(18%); }
+
+/* Letters sit still by default — motion only happens on hover, per letter. */
+.entropy-title .letter {
+  display: inline-block;
+  pointer-events: auto;
+}
+.entropy-title .letter-glyph {
+  display: inline-block;
+  transform-origin: bottom center;
+  transition: color 0.3s ease;
+}
+.entropy-title .letter:hover .letter-glyph {
+  color: var(--blue);
+  animation: letterShake 0.7s ease-in-out 2;
+}
+
+/* One or two gentle sways, pivoting from the letter's base, then settle */
+@keyframes letterShake {
+  0%, 100% { transform: rotate(0deg); }
+  25%      { transform: rotate(-5deg); }
+  50%      { transform: rotate(4deg); }
+  75%      { transform: rotate(-2deg); }
+}
+
+/* RGB split layers (positioned twins) */
+.entropy-title.split::before,
+.entropy-title.split::after {
+  content: attr(data-text);
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  pointer-events: none;
+  opacity: 0;
+}
+
+/* ─── Bounding boxes (B motion) ─── */
+.bbox {
+  position: absolute;
+  border: 1.5px solid var(--red);
+  pointer-events: none;
+  z-index: 6;
+  will-change: transform;
+}
+.bbox-x {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+.bbox-x line {
+  stroke: var(--red);
+  stroke-width: 1;
+  vector-effect: non-scaling-stroke;
+}
+.bbox-handle {
+  position: absolute;
+  width: 6px; height: 6px;
+  background: white;
+  border: 1.5px solid var(--red);
+}
+.bbox-handle.tl { top: -4px; left: -4px; }
+.bbox-handle.tr { top: -4px; right: -4px; }
+.bbox-handle.bl { bottom: -4px; left: -4px; }
+.bbox-handle.br { bottom: -4px; right: -4px; }
+
+@keyframes bboxBreath {
+  0%, 100% { transform: translate(0,0) scale(1); }
+  50%      { transform: translate(var(--dx, 2px), var(--dy, -1px)) scale(1.012); }
+}
+@keyframes bboxFlicker {
+  0%, 95%, 100% { border-color: var(--red); opacity: 1; }
+  96%, 99%      { border-color: var(--red); opacity: 0.35; }
+}
+
+.bbox--1 { top: 14%; left:  8%; width: 24%; height: 48%; --dx: 3px; --dy: -2px;
+  animation: bboxBreath 5s ease-in-out infinite, bboxFlicker 6s linear infinite; }
+.bbox--2 { top: 27.5%; left: 31%; width: 18%; height: 33%; --dx: -2px; --dy: 2px;
+  animation: bboxBreath 6.4s ease-in-out infinite -1s, bboxFlicker 7s linear infinite -2s; }
+.bbox--4 { top: 58.25%; left: 40.25%; width: 13.5%; height: 25.5%; --dx: -1px; --dy: -2px;
+  animation: bboxBreath 7s ease-in-out infinite -0.5s, bboxFlicker 8s linear infinite -1s; }
+
+/* scroll cue: a pill floating at the cover's bottom-right edge, bobbing gently */
+.scroll-cue {
+  position: absolute;
+  right: var(--pad);
+  bottom: calc(var(--pad) + 64px); /* clears the cover footer */
+  z-index: 10;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 18px 12px 20px;
+  border-radius: 999px;
+  background: var(--red);
+  border: 1.5px solid var(--ink);
+  box-shadow: 4px 4px 0 var(--ink);
+  color: white;
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  animation: cueFloat 2.4s ease-in-out infinite;
+  transition: background 0.2s, translate 0.12s, box-shadow 0.12s;
+}
+.scroll-cue:hover { background: var(--ink); animation-play-state: paused; }
+/* pressing pushes it onto its shadow; `translate` stacks on top of the float's transform */
+.scroll-cue:active { translate: 4px 4px; box-shadow: 0 0 0 var(--ink); }
+.scroll-cue-arrow { font-size: 14px; letter-spacing: 0; }
+@keyframes cueFloat {
+  0%, 100% { transform: translateY(0); }
+  50%      { transform: translateY(-8px); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .scroll-cue { animation: none; }
+}
+
+/* cover backdrop, borrowed from About: drifting dot clusters (.about-dots canvas), corner coordinates,
+   registration marks, dashed guides — laid out exactly as About's, in the space between the topbar and the footer */
+/* full-bleed like About's: out of the 1240px page column to the screen edges (body clips the x overflow) */
+.cover-deco { position: absolute; top: calc(var(--pad) + 36px); bottom: calc(var(--pad) + 56px); left: calc(50% - 50vw); width: 100vw; pointer-events: none; }
+/* crop marks + measured baseline hugging the ENTROPY letters, as on "Let's collide." (JS fits the box to the letters) */
+.cover-marks, .cover-avoid { position: absolute; pointer-events: none; z-index: 6; }
+/* intro on load (JS adds .is-in once fonts are in and sets --i): the cursor drags a red box out, and the letters
+   it encloses appear (JS adds .is-shown) — rising in, tilted, their dot shadows slipping out after them — then the box goes.
+   Transforms go on .letter-glyph so the .letter boxes JS measures stay put */
+.cover .entropy-title .letter-glyph {
+  transition: color 0.3s ease, transform 1.1s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.35s ease;
+}
+/* the letters show only inside the box being dragged: the title is clipped to the box (same timing, same corner) */
+.cover .entropy-title {
+  clip-path: inset(var(--y, 0) calc(100% - var(--x, 0px)) calc(100% - var(--y, 0px)) var(--x, 0));
+  transition: clip-path 1.2s cubic-bezier(0.65, 0, 0.35, 1) 0.4s; /* = the box's width/height transition */
+}
+.cover.is-in .entropy-title {
+  clip-path: inset(var(--y) calc(100% - var(--x) - var(--w)) calc(100% - var(--y) - var(--h)) var(--x));
+}
+.cover.intro-done .entropy-title { clip-path: none; transition: none; } /* hover sways aren't cut off later */
+/* filter/translate, since the pulse owns opacity and the mouse parallax owns transform */
+.cover .stage-canvas > .dot-block {
+  transition: filter 0.6s ease 0.4s, translate 0.9s cubic-bezier(0.22, 1, 0.36, 1) 0.4s;
+}
+.cover .stage-canvas > .dot-block:not(.is-shown) { filter: opacity(0); translate: -17% -11%; } /* = back under its letter */
+/* red boxes: dragged out like a selection marquee, a cursor at the moving corner (JS adds .bbox-cursor) */
+.cover .bbox {
+  left: var(--x); top: var(--y); width: var(--w); height: var(--h); /* JS fits these around letters */
+  --d: calc(0.4s + var(--i, 0) * 0.8s); /* drag start, one box after another */
+  transition: width 1.2s cubic-bezier(0.65, 0, 0.35, 1) var(--d), height 1.2s cubic-bezier(0.65, 0, 0.35, 1) var(--d),
+    visibility 0s linear calc(var(--d) - 0.25s), transform 0.55s cubic-bezier(.2,.8,.2,1);
+}
+.cover:not(.is-in) .bbox { width: 0; height: 0; visibility: hidden; }
+.cover.intro-done .bbox { transition: transform 0.55s cubic-bezier(.2,.8,.2,1); } /* resizes: no drag delay */
+.cover .bbox.is-gone { filter: opacity(0); transition: filter 0.4s ease; } /* filter: the flicker owns opacity */
+/* letters caught by a box: blue while selected, a sway when picked */
+.entropy-title .letter.is-sel .letter-glyph { color: var(--blue); }
+.entropy-title .letter.is-picked .letter-glyph { color: var(--blue); animation: letterShake 0.7s ease-in-out 2; }
+/* the visitor's own drag box, with its size readout under it */
+.marquee-sel {
+  position: fixed;
+  z-index: 50;
+  border: 1.5px solid var(--red);
+  background: rgba(255, 26, 26, 0.06); /* --red, faint */
+  pointer-events: none;
+  transition: opacity 0.4s ease;
+}
+.marquee-sel.is-done { opacity: 0; }
+.marquee-sel span {
+  position: absolute;
+  left: -1.5px; top: calc(100% + 6px);
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 0.14em;
+  color: var(--red);
+  white-space: nowrap;
+}
+.bbox-cursor {
+  position: absolute; left: 100%; top: 100%;
+  width: 14px; height: 21px; margin: -1px 0 0 -1px; /* arrow tip on the corner */
+  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 14 21'%3E%3Cpath d='M1 1v16l4-3.6 3 6.4 2.6-1.2-3-6.3H13z' fill='%23111' stroke='white' stroke-width='1.2' stroke-linejoin='round'/%3E%3C/svg%3E") no-repeat center / contain;
+  opacity: 0;
+  pointer-events: none;
+}
+.cover.is-in .bbox-cursor { animation: cursorDrag 2.1s ease both calc(var(--d) - 0.25s); }
+@keyframes cursorDrag { 0% { opacity: 0; } 15%, 75% { opacity: 1; } 100% { opacity: 0; } } /* in, drag (to ~70%), out */
+@media (prefers-reduced-motion: reduce) {
+  .cover .entropy-title, .cover .entropy-title .letter-glyph, .cover .stage-canvas > .dot-block, .cover .bbox { transition: none; }
+  .bbox-cursor { display: none; }
+}
+/* the bottom-right label takes the pill's old corner, so the pill moves up a little */
+.cover > .scroll-cue { bottom: calc(var(--pad) + 100px); }
+
+/* ─── Cover footer (email, ticker, clock) ─── */
+.cover-foot {
+  display: grid;
+  grid-template-columns: 1fr 2fr 1fr;
+  align-items: end;
+  gap: 24px;
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--ink-soft);
+  padding-top: 24px;
+  border-top: 1px solid var(--line);
+}
+.cover-foot a {
+  color: var(--ink);
+  text-transform: none;
+  letter-spacing: 0;
+  font-size: 13px;
+  font-family: var(--sans);
+  font-weight: 500;
+  border-bottom: 1px solid currentColor;
+  padding-bottom: 1px;
+  transition: color 0.2s;
+}
+.cover-foot a:hover { color: var(--blue); }
+
+.foot-ticker {
+  overflow: hidden;
+  mask-image: linear-gradient(90deg, transparent, black 10%, black 90%, transparent);
+  -webkit-mask-image: linear-gradient(90deg, transparent, black 10%, black 90%, transparent);
+  text-align: center;
+}
+.foot-ticker-track {
+  display: inline-flex;
+  gap: 2.5em;
+  white-space: nowrap;
+  animation: tickerScroll 32s linear infinite;
+}
+.foot-ticker-track > * { display: inline-block; }
+.foot-ticker em { font-style: normal; color: var(--blue); }
+@keyframes tickerScroll { to { transform: translateX(-50%); } }
+.foot-time { text-align: right; font-variant-numeric: tabular-nums; }
+
+/* ─── Section divider strip (full-bleed bar, content stays aligned to the page column) ─── */
+.divider {
+  width: 100vw;
+  position: relative;
+  left: 50%;
+  margin-left: -50vw;
+  padding: 14px 0;
+  border-top: 1px solid var(--line);
+  border-bottom: 1px solid var(--line);
+  background: var(--bg-deep);
+}
+.divider-inner {
+  max-width: 1240px;
+  margin: 0 auto;
+  padding: 0 var(--pad);
+  display: grid;
+  grid-template-columns: 100px 1.5fr 1fr 1fr 100px;
+  gap: 24px;
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--ink-soft);
+}
+.divider b { color: var(--ink); font-weight: 500; }
+/* Projects bar steps aside while a card's key visual fills the section (#works opacity is set inline by the scroll fade) */
+#works { transition: border-color 0.5s ease; } /* not opacity: that would lag the scroll fade */
+#works .divider-inner { transition: opacity 0.5s ease; }
+#works.is-bg { border-color: transparent; }
+#works.is-bg .divider-inner { opacity: 0; }
+
+/* ─── Marquee strip — the one "moving bar" transition (full-bleed, scrolling) ─── */
+.marquee-strip {
+  width: 100vw;
+  position: relative;
+  left: 50%;
+  margin-left: -50vw;
+  overflow: hidden;
+  padding: 26px 0;
+  background: var(--ink);
+  cursor: crosshair;
+}
+.marquee-track {
+  display: inline-flex;
+  width: max-content;
+  gap: 0;
+  white-space: nowrap;
+  /* duration is set by JS from the track width, so the speed stays constant */
+  animation: tickerScroll 60s linear infinite;
+}
+.marquee-strip:hover .marquee-track { animation-play-state: paused; }
+.marquee-track span {
+  display: inline-block;
+  padding: 0 1.1em;
+  font-family: var(--display);
+  font-weight: 700;
+  font-size: 28px;
+  letter-spacing: -0.01em;
+  color: rgba(255,255,255,0.92);
+}
+.marquee-track em {
+  font-style: normal;
+  color: var(--red);
+  font-size: 0.5em;
+  vertical-align: middle;
+}
+
+/* ─── About (full-bleed band, content stays in the page column) ─── */
+.about {
+  width: 100vw;
+  position: relative;
+  left: 50%;
+  margin-left: -50vw;
+  background: var(--bg-deep);
+}
+.about-inner {
+  max-width: 1240px;
+  margin: 0 auto;
+  padding: 56px var(--pad) 40px;
+}
+/* label on top like Expertise's; below it one screen with two states stacked in the same cell:
+   "Let's collide." alone, and (after the button, .is-open) a bento grid of everything about me */
+.about-stage {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr); /* never wider than the page column, so centring is true page centre */
+  min-height: calc(100svh - 190px); /* divider + padding + label: the stage fills the rest of the screen */
+  margin-top: 16px;
+}
+.about-stage > * { grid-area: 1 / 1; }
+.about { overflow-x: clip; } /* the backdrop and guide lines may run past the screen edge */
+.about-inner { position: relative; z-index: 1; }
+
+/* backdrop over the whole first screen of About, edge to edge: drifting halftone dot clusters (canvas),
+   corner coordinates (as in Projects), print registration marks and faint guides */
+.about-deco {
+  position: absolute;
+  left: 0; right: 0; top: 0;
+  height: calc(100svh - 45px); /* one screen below the divider strip */
+  pointer-events: none;
+}
+.about-dots { position: absolute; inset: 0; width: 100%; height: 100%; }
+.reg {
+  position: absolute;
+  width: 18px; height: 18px;
+  border: 1.2px solid currentColor;
+  border-radius: 50%;
+  color: var(--red);
+  opacity: 0.7;
+  translate: -50% -50%; /* centred on its spot */
+}
+.reg[style*="right"] { translate: 50% -50%; }
+.reg[style*="bottom"] { translate: -50% 50%; }
+.reg::before, .reg::after {
+  content: "";
+  position: absolute;
+  left: 50%; top: 50%;
+  translate: -50% -50%;
+  background: currentColor;
+}
+.reg::before { width: 32px; height: 1.2px; }
+.reg::after { width: 1.2px; height: 32px; }
+.guide-v { position: absolute; top: 0; bottom: 0; border-left: 1px dashed rgba(31, 61, 240, 0.3); }
+
+/* on the letters (in .about-marks, so they come and go with them): crop marks and the measured baseline
+   (JS writes the real size) */
+.crop { position: absolute; width: 44px; height: 44px; border: 0 dashed var(--red); }
+.crop.tl { top: -34px; left: -34px; border-top-width: 1.5px; border-left-width: 1.5px; }
+.crop.tr { top: -34px; right: -34px; border-top-width: 1.5px; border-right-width: 1.5px; }
+.crop.bl { bottom: -34px; left: -34px; border-bottom-width: 1.5px; border-left-width: 1.5px; }
+.crop.br { bottom: -34px; right: -34px; border-bottom-width: 1.5px; border-right-width: 1.5px; }
+/* dimension at the baseline: end ticks at the letters' edges, their size written under the start */
+.about-measure {
+  position: absolute;
+  left: 0; right: 0; top: 86%;
+  height: 13px;
+  translate: 0 -50%;
+  border-inline: 1px solid var(--red);
+}
+.about-measure span {
+  position: absolute;
+  left: 0; top: calc(100% + 6px);
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 0.14em;
+  color: var(--red);
+  white-space: nowrap;
+}
+.about-hello {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 48px;
+  text-align: center;
+}
+/* About me and Back: same pill, same spot (bottom centre of the stage); both states leave room for it */
+.about-stage { position: relative; }
+.about-hello, .about-bento { padding-bottom: calc(9vh + 64px); }
+.about-stage .scroll-cue {
+  position: absolute;
+  left: 0; right: 0; bottom: 9vh;
+  width: fit-content;
+  min-width: 150px;
+  margin-inline: auto; /* centred without translate, which the pressed state uses */
+  justify-content: center;
+}
+.about-hello .scroll-cue { transition: opacity 0.4s ease, background 0.2s, translate 0.12s, box-shadow 0.12s; }
+.about-stage:not(.is-in) .about-hello .scroll-cue,
+.about-stage.is-open .about-hello .scroll-cue { opacity: 0; pointer-events: none; }
+.about-bento {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  grid-auto-rows: minmax(130px, auto);
+  align-content: center;
+  gap: 14px;
+}
+.bento-tile {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 20px;
+  padding: 22px 24px;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  background: var(--bg);
+  color: var(--ink);
+  text-decoration: none;
+}
+.bento-intro { grid-column: 1 / 5; grid-row: span 2; }
+.bento-side { grid-column: 5 / 7; }
+.bento-wide { grid-column: 1 / -1; }
+.bento-mail { display: inline-block; margin-top: 6px; color: var(--ink); text-decoration: none; border-bottom: 1px solid var(--blue); }
+.bento-mail:hover { color: var(--blue); }
+/* four fields in columns split by thin rules; each opens with its expertise icon and a red index,
+   and on hover the icon grows and the name turns blue (as on the expertise cards) */
+.bento-fields { display: grid; grid-template-columns: repeat(4, 1fr); }
+.bento-fields > div { padding: 0 20px; border-left: 1px solid var(--line); }
+.bento-fields > div:first-child { padding-left: 0; border-left: none; }
+.bento-fields p { margin-top: 6px; font-size: 13px; line-height: 1.45; color: var(--ink-soft); }
+.field-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; font-family: var(--mono); font-size: 10px; letter-spacing: 0.14em; color: var(--red); }
+.field-head i { font-style: normal; font-size: 14px; color: var(--blue); opacity: 0.6; transition: transform 0.3s ease, opacity 0.3s ease; }
+.bento-fields > div:hover .field-head i { opacity: 1; transform: scale(1.25); }
+.bento-fields .bento-big { transition: color 0.3s ease; }
+.bento-fields > div:hover .bento-big { color: var(--blue); }
+.bento-big {
+  font-family: var(--display);
+  font-size: clamp(20px, 2vw, 28px);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  overflow-wrap: anywhere;
+}
+.bento-links { font-family: var(--mono); font-size: 12px; letter-spacing: 0.04em; line-height: 1.8; }
+/* heading right under the label with a gentle wave under it, drawn below the descenders (y, g) so nothing cuts it;
+   the text settles at the bottom */
+.bento-intro { justify-content: flex-start; }
+.bento-intro .bento-big {
+  position: relative;
+  align-self: flex-start; /* the wave spans the words, not the tile */
+  padding-bottom: 0.3em;
+  /* set like "LET'S COLLIDE.": the cover's Archivo squeezed narrow */
+  font-family: var(--display-cover);
+  font-stretch: 62%;
+  font-weight: 900;
+  font-size: clamp(40px, 5vw, 72px);
+  line-height: 1;
+  letter-spacing: 0;
+}
+.bento-intro .bento-big::after {
+  content: "";
+  position: absolute;
+  left: 0; right: 0; bottom: 0;
+  height: 0.2em;
+  background: var(--blue);
+  /* same wave as under "collide.", a touch heavier stroke since it's drawn smaller */
+  -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 12'%3E%3Cpath d='M0 6 Q10 0 20 6 T40 6' fill='none' stroke='black' stroke-width='4' stroke-linecap='round'/%3E%3C/svg%3E") repeat-x left center / auto 100%;
+          mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 12'%3E%3Cpath d='M0 6 Q10 0 20 6 T40 6' fill='none' stroke='black' stroke-width='4' stroke-linecap='round'/%3E%3C/svg%3E") repeat-x left center / auto 100%;
+  /* drawn left → right once the card has landed (like "collide."); wiped when the bento closes */
+  clip-path: inset(0 0 0 0);
+  transition: clip-path 1.6s cubic-bezier(0.65, 0, 0.35, 1) 1.1s; /* starts while the last letters are still rising */
+}
+.about-stage:not(.is-open) .bento-intro .bento-big::after { clip-path: inset(0 100% 0 0); transition-duration: 0.3s; transition-delay: 0s; }
+.bento-intro .about-body { margin-top: auto; padding-top: 18px; font-size: clamp(16px, 1.4vw, 20px); }
+/* like the project cards: until opened, tiles wait below, tilted; on .is-open they fly up one by one (JS sets --i) */
+.about-bento > * { transition: transform 1.1s cubic-bezier(0.22, 1, 0.36, 1) calc(var(--i) * 0.08s), opacity 0.35s ease calc(var(--i) * 0.08s), background 0.3s; }
+.about-stage:not(.is-open) .about-bento > * { opacity: 0; transform: translateY(40vh) rotate(6deg); }
+.about-stage:not(.is-open) .about-bento > :nth-child(2n) { transform: translateY(40vh) rotate(-5deg); }
+.section-label {
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--ink-soft);
+}
+.section-label::before {
+  content: '— ';
+  color: var(--red);
+  font-weight: 700;
+}
+.about-body {
+  font-size: clamp(20px, 2vw, 28px);
+  line-height: 1.25;
+  font-weight: 500;
+  letter-spacing: -0.018em;
+}
+.about-body em {
+  font-style: italic;
+  color: var(--blue);
+  font-weight: 700;
+  font-family: var(--display);
+}
+.about-body s {
+  text-decoration-color: var(--red);
+  text-decoration-thickness: 2px;
+  color: var(--ink-soft);
+}
+/* poster letters on one line: the cover's Archivo squeezed narrow, a wavy line under "collide.";
+   letters sway blue on hover. Behind them the cover's halftone dot shadows */
+.about-collide {
+  display: flex;
+  justify-content: center;
+  column-gap: 0.22em;
+  white-space: nowrap;
+  font-family: var(--display-cover);
+  font-stretch: 62%;
+  font-weight: 900;
+  font-size: min(12.5vw, 200px); /* vw so the line always fits the screen width; 200px cap fits the 1240px column */
+  line-height: 0.9;
+  text-transform: uppercase;
+  color: var(--ink);
+}
+.about-collide .row { position: relative; color: inherit; text-decoration: none; }
+.about-collide { position: relative; }
+/* .letters (collide + the intro heading): JS splits them into .ch spans, each with its own dot shadow */
+.letters .ch { display: inline-block; position: relative; isolation: isolate; transform-origin: bottom center; } /* isolate: the dot shadow's z-index -1 stays inside its letter */
+/* dot shadow per letter, nudged down-right like the cover's misregistration (box = glyph height / the 26×34 dot grid) */
+.letters .dot-block {
+  z-index: -1;
+  left: 50%; top: 50%;
+  height: 1.1em;
+  aspect-ratio: 26 / 34;
+  translate: calc(-50% + 0.06em) calc(-50% + 0.06em);
+}
+/* marks come in after the letters land, and leave with them */
+.about-collide .about-marks { position: absolute; inset: 0; pointer-events: none; transition: opacity 0.4s ease 1s; }
+.about-stage:not(.is-in) .about-marks,
+.about-stage.is-open .about-marks { opacity: 0; transition-delay: 0s; }
+.about-collide a::after {
+  content: "";
+  position: absolute;
+  left: 4%; right: 12%; bottom: -0.16em;
+  height: 0.12em;
+  background: var(--blue);
+  -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 12'%3E%3Cpath d='M0 6 Q10 0 20 6 T40 6' fill='none' stroke='black' stroke-width='3.2' stroke-linecap='round'/%3E%3C/svg%3E") repeat-x left center / auto 100%;
+          mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 12'%3E%3Cpath d='M0 6 Q10 0 20 6 T40 6' fill='none' stroke='black' stroke-width='3.2' stroke-linecap='round'/%3E%3C/svg%3E") repeat-x left center / auto 100%;
+  /* drawn left → right once the letters have landed; wiped instantly when they leave */
+  clip-path: inset(0 0 0 0);
+  transition: clip-path 0.9s cubic-bezier(0.65, 0, 0.35, 1) 1.7s;
+}
+.about-stage:not(.is-in) .about-collide a::after,
+.about-stage.is-open .about-collide a::after { clip-path: inset(0 100% 0 0); transition-duration: 0.3s; transition-delay: 0s; }
+.about-stage.is-in:not(.is-open) .about-collide .ch:hover,
+.about-stage.is-open .bento-intro .ch:hover { color: var(--blue); animation: letterShake 0.7s ease-in-out 2; }
+.about-collide .ch {
+  transition: transform 1.1s cubic-bezier(0.22, 1, 0.36, 1) calc(0.3s + var(--i) * 0.06s), opacity 0.35s ease calc(0.3s + var(--i) * 0.06s);
+}
+/* letters fly up in when the stage comes into view, and fly off the top when the button opens the bento */
+.about-stage:not(.is-in) .about-collide .ch { opacity: 0; transform: translateY(60vh) rotate(18deg); }
+.about-stage:not(.is-in) .about-collide .ch:nth-child(2n) { transform: translateY(60vh) rotate(-14deg); }
+.about-stage.is-open .about-collide .ch { opacity: 0; transform: translateY(-60vh) rotate(-14deg); transition-delay: calc(var(--i) * 0.03s); }
+.about-stage.is-open .about-collide .ch:nth-child(2n) { transform: translateY(-60vh) rotate(12deg); }
+/* the intro heading's letters rise out of the description below them, once the card has landed */
+.bento-intro .ch {
+  transition: transform 1.1s cubic-bezier(0.22, 1, 0.36, 1) calc(0.5s + var(--i) * 0.04s), opacity 0.35s ease calc(0.5s + var(--i) * 0.04s);
+}
+.about-stage:not(.is-open) .bento-intro .ch { opacity: 0; transform: translateY(var(--rise, 2.5em)) rotate(18deg); transition-delay: 0s; }
+.about-stage:not(.is-open) .bento-intro .ch:nth-child(2n) { transform: translateY(var(--rise, 2.5em)) rotate(-14deg); }
+
+/* ─── Expertise ─── */
+.expertise {
+  max-width: 1240px;
+  margin: 0 auto;
+  padding: 0 var(--pad) 48px; /* the about text above supplies the top spacing */
+}
+.expertise-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 0;
+  margin-top: 16px;
+  border: 1px solid var(--line);
+}
+.expertise-card {
+  padding: 24px 22px;
+  display: flex;
+  flex-direction: column;
+  border-right: 1px solid var(--line);
+  position: relative;
+  transition: background 0.3s ease;
+}
+.expertise-card:last-child { border-right: none; }
+.expertise-card:hover { background: rgba(31, 61, 240, 0.045); }
+.expertise-card::after {
+  content: '';
+  position: absolute;
+  left: 0; right: 0; bottom: 0;
+  height: 3px;
+  background: var(--red);
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 0.5s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.expertise-card:hover::after { transform: scaleX(1); }
+.exp-icon {
+  position: absolute; /* top-right corner, so it costs no height */
+  top: 22px;
+  right: 22px;
+  font-size: 18px;
+  color: var(--red);
+  opacity: 0.6;
+  transition: opacity 0.3s, transform 0.3s;
+}
+.expertise-card:hover .exp-icon { opacity: 1; transform: scale(1.12); }
+.exp-index {
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 0.12em;
+  color: var(--ink-soft);
+  margin-bottom: 14px;
+}
+.exp-title {
+  font-family: var(--display);
+  font-weight: 700;
+  font-size: 26px;
+  letter-spacing: -0.01em;
+  margin-bottom: 8px;
+  color: var(--ink);
+  transition: color 0.3s;
+}
+.expertise-card:hover .exp-title { color: var(--blue); }
+.exp-desc {
+  font-family: var(--sans);
+  font-size: 13px;
+  line-height: 1.65;
+  color: var(--ink-soft);
+  margin-bottom: 14px;
+}
+.exp-tools {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: auto;
+}
+.exp-tools span {
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 0.04em;
+  color: var(--ink-soft);
+  border: 1px solid var(--line);
+  padding: 4px 8px;
+  transition: border-color 0.3s, color 0.3s;
+}
+.expertise-card:hover .exp-tools span {
+  border-color: rgba(31, 61, 240, 0.3);
+  color: var(--ink);
+}
+
+/* ─── Selected works (draggable arc, full-bleed band) ─── */
+.works {
+  width: 100vw;
+  position: relative;
+  left: 50%;
+  margin-left: -50vw;
+  overflow-x: clip; /* x only, so the hover image can reach up behind the divider */
+  /* no background of its own: the page colour behind it shifts instead */
+}
+/* hovered card's key visual behind the whole section; JS puts the image (or split group) in it */
+.works-hover-bg {
+  position: absolute;
+  inset: -45px 0 0; /* 45px = divider strip above, so the image covers it too */
+  opacity: 0;
+  transition: opacity 0.5s ease;
+  pointer-events: none;
+}
+.works-hover-bg.is-on { opacity: 0.85; } /* strength knob */
+.works-hover-bg img { display: block; width: 100%; height: 100%; object-fit: cover; }
+.works-hover-bg video { display: block; width: 100%; height: 100%; object-fit: contain; background: #000; } /* whole frame, black either side */
+
+/* split group on a white sheet (sized for ~16:9 boxes): 1st image top right, 2nd bottom left sitting on the bottom edge
+   (the Naver phone is cut off at its bottom, so it reads as rising out of the frame); a card shows data-thumb instead when set */
+.psplit { position: relative; width: 100%; height: 100%; background: white; }
+div.psplit img { position: absolute; object-fit: contain; }
+div.psplit img:nth-child(1) { top: 9%; right: 3%; width: 50%; height: auto; }
+/* clip trims the Naver file's stray dark top row and the black bezel strip along its bottom (~2%); bottom < 0 hides the gap that leaves */
+div.psplit img:nth-child(2) { bottom: -1.5%; left: 4%; height: 72%; width: auto; clip-path: inset(1% 0 2.2%); }
+/* card with several thumbs: the 2nd fills the card (naver-card.gif already has white space up top),
+   the 1st sits in that space; multiply drops its white background so the two blend */
+.pcard div.psplit img:nth-child(1) { z-index: 1; top: 8%; left: 2%; right: auto; width: 96%; mix-blend-mode: multiply; clip-path: inset(0 0 2%); } /* clip: faint grey bottom row in the Google file */
+.pcard div.psplit img:nth-child(2) { inset: 0; width: 100%; height: 100%; clip-path: none; transform: translateY(10%); } /* drop knob: sinks the phone below the card edge */
+.works-inner {
+  position: relative;
+  max-width: 1240px;
+  margin: 0 auto;
+  padding: 84px var(--pad) 20px; /* with the ring height below, divider + section = exactly one screen */
+}
+.works-inner > *:not(.works-bg) {
+  position: relative;
+  z-index: 1;
+}
+
+/* ─── Selected: decorative background (cover-design echoes) ─── */
+.works-bg {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+
+/* Corner coordinate / meta labels */
+.works-coord {
+  position: absolute;
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--ink-soft);
+  white-space: nowrap;
+}
+.works-coord::before {
+  content: '+';
+  color: var(--red);
+  margin-right: 6px;
+}
+.works-coord-tl { top: 18px;    left: var(--pad); }
+.works-coord-tr { top: 18px;    right: var(--pad); }
+.works-coord-bl { bottom: 20px; left: var(--pad); }
+.works-coord-br { bottom: 20px; right: var(--pad); }
+
+/* field filter above the ring: non-matching cards dim instead of leaving the wheel */
+/* plain text tabs: faint until picked; padding widens the hit area without showing a box */
+.pfilter {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 0 18px;
+  margin-bottom: 14px;
+}
+.pfilter button {
+  padding: 12px 10px;
+  border: 0;
+  background: none;
+  font-family: var(--display);
+  font-size: 15px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--ink);
+  opacity: 0.28;
+  cursor: crosshair;
+  transition: opacity 0.25s;
+}
+.pfilter button:hover { opacity: 0.6; }
+.pfilter button[aria-pressed="true"] { opacity: 1; font-weight: 700; }
+
+/* ─── Project ring: a slowly turning wheel of cards that zooms in to its top arc;
+   picking a card fans that project's images out in 3D ─── */
+.pring {
+  --cw: 176px; --ch: 234px;   /* ring card */
+  /* stack layer, 16:9 like the slides; on shorter screens it shrinks with the ring so its top and bottom
+     stay clear of the ring edge and the title/buttons below (0.58 = share of the ring height) */
+  --lh: min(461px, calc(clamp(480px, calc(100svh - 210px), 740px) * 0.58));
+  --lw: calc(var(--lh) * 16 / 9);
+  --off: 110px;               /* stack layer step */
+  position: relative;
+  /* divider (45) + top padding (84) + filter row (~60) + bottom padding (20) + ring = one screen, so the scroll stop frames it */
+  height: clamp(480px, calc(100svh - 210px), 740px);
+  margin: 0 calc(50% - 50vw); /* full band width, not just the 1240px column */
+  overflow: hidden;
+  cursor: grab;
+  user-select: none;
+  touch-action: pan-y;
+  /* fade cards out at the left/right edge instead of a hard clip mid-card */
+  mask-image: linear-gradient(90deg, transparent, black 6%, black 94%, transparent);
+  -webkit-mask-image: linear-gradient(90deg, transparent, black 6%, black 94%, transparent);
+}
+.pring.dragging { cursor: grabbing; }
+
+/* the wheel is a 0×0 point at the ring's centre, pushed down so only its top arc shows; JS sets --r and --dy.
+   The spin (.pring-spin inside it) is its own layer animated by transform only, so it stays on the GPU */
+.pring-wheel {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translateY(var(--dy, 0px));
+  will-change: transform;
+}
+.pring-spin { position: absolute; left: 0; top: 0; will-change: transform; }
+
+.pcard {
+  position: absolute;
+  left: 0; top: 0;
+  width: var(--cw);
+  height: var(--ch);
+  margin: calc(var(--ch) / -2) 0 0 calc(var(--cw) / -2);
+  border-radius: 10px;
+  overflow: hidden;
+  transform: rotate(var(--a, 0deg)) translateY(calc(-1 * var(--r)));
+  background: linear-gradient(165deg, rgba(11, 18, 64, 0.12) 0%, rgba(11, 18, 64, 0.5) 55%, var(--ink) 100%);
+  box-shadow: 4px 8px 22px rgba(11, 18, 64, 0.22);
+  color: white;
+  text-decoration: none;
+  transition: opacity 0.5s ease, outline-offset 0.3s ease;
+}
+/* entrance: until the ring is in view each card waits below the screen, tilted; on .is-in they fly up
+   one by one (left → right, JS sets --delay / --tilt) and land in their slot on the arc */
+.pring:not(.is-in) .pcard {
+  opacity: 0;
+  transform: rotate(var(--a, 0deg)) translateY(calc(-1 * var(--r))) translateY(110vh) rotate(var(--tilt, 20deg));
+}
+.pring.is-landing .pcard {
+  transition: transform 1.1s cubic-bezier(0.22, 1, 0.36, 1) var(--delay, 0s), opacity 0.35s ease var(--delay, 0s);
+}
+.pcard img { display: block; width: 100%; height: 100%; object-fit: cover; pointer-events: none; transition: opacity 0.4s ease; }
+/* while the hover background is up, the other cards drop to their base gradient and go see-through */
+.pring.is-bg:not(.is-open) .pcard:not(:hover) img { opacity: 0; }
+.pring.is-bg:not(.is-open) .pcard:not(:hover):not(.is-dim) { opacity: 0.35; } /* transparency knob */
+.pcard:hover, .pcard:focus-visible { outline: 1.5px solid var(--red); outline-offset: 5px; }
+.pcard.is-dim { opacity: 0.12; pointer-events: none; }
+.pring.is-open .pcard { opacity: 0; pointer-events: none; }
+
+/* placeholder for projects without images yet: number · year over the title */
+.pcard-ph {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  height: 100%;
+  padding: 12px;
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 0.12em;
+  color: rgba(255, 255, 255, 0.55);
+}
+.pcard-ph b {
+  font-family: var(--display);
+  font-size: 13px;
+  font-weight: 700;
+  line-height: 1.22;
+  letter-spacing: 0;
+  color: white;
+}
+
+/* caption: the card at the top of the wheel */
+.pring-caption {
+  position: absolute;
+  left: 0; right: 0; bottom: 30px;
+  z-index: 2;
+  text-align: center;
+  pointer-events: none;
+  transition: opacity 0.4s ease;
+}
+.pring-kicker {
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--ink-soft);
+}
+.pring-title {
+  display: block;
+  margin-top: 6px;
+  font-family: var(--display);
+  font-size: 20px;
+  font-weight: 600;
+  color: var(--ink);
+  transform-origin: 50% 100%;
+  transition: transform 0.35s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.pring:has(.pcard:hover) .pring-title { transform: scale(1.4); } /* 20px → 28px while a card is hovered */
+.pring-caption.is-dim { opacity: 0.25; } /* top card is outside the current filter */
+.pring.is-open .pring-caption { opacity: 0; }
+
+/* ── 3D stack of the opened project ── */
+.pstack {
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  perspective: 1400px;
+  pointer-events: none;
+  cursor: default;
+}
+.pring.is-open .pstack { pointer-events: auto; }
+.pstack-layers { position: absolute; top: 42%; transform-style: preserve-3d; } /* left set by JS to centre the fan */
+.pstack-layer {
+  position: absolute;
+  width: var(--lw);
+  height: var(--lh);
+  margin: calc(var(--lh) / -2) 0 0 calc(var(--lw) / -2);
+  border-radius: 12px;
+  overflow: hidden;
+  background: linear-gradient(165deg, rgba(11, 18, 64, 0.12) 0%, rgba(11, 18, 64, 0.5) 55%, var(--ink) 100%);
+  box-shadow: 6px 14px 34px rgba(11, 18, 64, 0.26);
+  opacity: 0;
+  transform: scale(0.6);
+  transition: transform 0.45s ease, opacity 0.3s ease;
+}
+.pstack-layer img { display: block; width: 100%; height: 100%; object-fit: cover; }
+.pstack-layer video { display: block; width: 100%; height: 100%; object-fit: contain; background: #000; } /* whole frame at its own ratio, black either side */
+.pstack-layer .pcard-ph { padding: 18px; }
+.pstack-layer .pcard-ph b { font-size: 20px; }
+.pring.is-open .pstack-layer {
+  /* --k: place in the fan relative to the card in front (0 = front, fractional while dragging).
+     k > 0 sits behind, fanned right; k < 0 has been flipped past and slides off left, fading out */
+  opacity: clamp(0, calc(1 + var(--k)), 1);
+  transform:
+    translateX(calc(max(var(--k), 0) * var(--off) + min(var(--k), 0) * var(--lw) * 0.7))    translateZ(calc(max(var(--k), 0) * -70px + min(var(--k), 0) * -80px))
+    rotateY(-14deg);
+  transition: transform 0.7s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.4s ease;
+  cursor: grab;
+}
+.pring.is-open .pstack.is-dragging .pstack-layer { transition: none; cursor: grabbing; } /* follow the pointer 1:1 */
+/* on open, the front card lands first and the rest fan out behind it one by one */
+.pring.is-opening .pstack-layer { transition-duration: 1s, 0.5s; transition-delay: calc(0.3s + var(--i) * 0.07s); }
+.pring.is-open .pstack-layer.is-past { pointer-events: none; }
+.pstack-count { align-self: center; min-width: 64px; font-family: var(--mono); font-size: 10px; letter-spacing: 0.14em; color: var(--ink-soft); }
+
+.pstack-info {
+  position: absolute;
+  left: var(--pad); right: var(--pad); bottom: 26px;
+  text-align: center;
+  opacity: 0;
+  transform: translateY(10px);
+  transition: opacity 0.3s ease, transform 0.3s ease;
+}
+.pring.is-open .pstack-info { opacity: 1; transform: none; transition: opacity 0.5s ease 0.6s, transform 0.6s cubic-bezier(0.22, 1, 0.36, 1) 0.6s; }
+.pstack-info h3 { font-family: var(--display); font-size: 22px; font-weight: 600; color: var(--ink); }
+.pstack-info p { max-width: 460px; margin: 6px auto 14px; font-size: 13px; line-height: 1.6; color: var(--ink-soft); }
+.pstack-actions { display: flex; justify-content: center; gap: 8px; }
+.pstack-actions a, .pstack-actions button {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 16px;
+  border: 1.5px solid var(--ink);
+  border-radius: 999px;
+  background: white;
+  box-shadow: 3px 3px 0 var(--ink);
+  color: var(--ink);
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  text-decoration: none;
+  cursor: crosshair;
+  transition: background 0.2s, color 0.2s, transform 0.15s, box-shadow 0.15s;
+}
+/* pressing pushes the button onto its shadow */
+.pstack-actions a:active, .pstack-actions button:active { transform: translate(3px, 3px); box-shadow: 0 0 0 var(--ink); }
+.pstack-actions a { background: var(--red); color: white; }
+.pstack-actions a:hover { background: #d11616; }
+.pstack-actions button:hover { background: var(--ink); color: white; }
+
+@media (prefers-reduced-motion: reduce) {
+  .pring.is-open .pstack-layer, .pring.is-open .pstack-info { transition: none; }
+}
+
+/* ─── Footer / Contact ─── */
+.foot {
+  width: 100vw;
+  position: relative;
+  left: 50%;
+  margin-left: -50vw;
+  background: var(--bg-deep);
+}
+.foot-inner {
+  max-width: 1240px;
+  margin: 0 auto;
+  padding: 80px var(--pad) 40px;
+  display: grid;
+  grid-template-columns: 1.6fr 1fr;
+  gap: 40px;
+  align-items: end;
+}
+.foot-side {
+  font-family: var(--mono);
+  font-size: 12px;
+  letter-spacing: 0.04em;
+  line-height: 1.8;
+}
+.foot-side dt {
+  text-transform: uppercase;
+  color: var(--ink-soft);
+  font-size: 10px;
+  letter-spacing: 0.14em;
+  margin-top: 18px;
+}
+.foot-side dt:first-child { margin-top: 0; }
+.foot-side dd { color: var(--ink); }
+.foot-bottom {
+  grid-column: 1 / -1;
+  display: flex;
+  justify-content: space-between;
+  margin-top: 40px;
+  padding-top: 24px;
+  border-top: 1px solid var(--line);
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--ink-soft);
+}
+
+/* ─── Reveal on scroll ─── */
+.reveal {
+  opacity: 0;
+  transform: translateY(24px);
+  transition: opacity 0.9s ease, transform 0.9s ease;
+}
+.reveal.in { opacity: 1; transform: translateY(0); }
+
+/* ─── Responsive ─── */
+@media (max-width: 600px) {
+  .toc { display: none; }
+}
+@media (max-width: 820px) {
+  .topbar, .topbar-title { font-size: 13px; }
+  .about-inner { padding: 70px var(--pad); }
+  .about-bento { grid-template-columns: 1fr; }
+  .bento-intro, .bento-side { grid-column: auto; grid-row: auto; }
+  .bento-fields { grid-template-columns: repeat(2, 1fr); row-gap: 24px; }
+  .bento-fields > div:nth-child(odd) { padding-left: 0; border-left: none; }
+  .expertise { padding: 0 var(--pad) 80px; }
+  .expertise-grid { grid-template-columns: repeat(2, 1fr); }
+  .expertise-card { min-height: 260px; border-bottom: 1px solid var(--line); }
+  .expertise-card:nth-child(2n) { border-right: none; }
+  .pring { height: 480px; --cw: 110px; --ch: 146px; --lw: 270px; --lh: 152px; --off: 16px; }
+  .works-coord-tr, .works-coord-bl { display: none; }
+  .foot-inner { grid-template-columns: 1fr; }
+  .cover-foot { grid-template-columns: 1fr; gap: 12px; text-align: left; }
+  .scroll-cue { bottom: calc(var(--pad) + 96px); } /* stacked footer is taller */
+  .cover-deco { bottom: calc(var(--pad) + 90px); }
+  .cover > .scroll-cue { bottom: calc(var(--pad) + 134px); }
+  .foot-time { text-align: left; }
+  .foot-ticker { display: none; }
+  body { cursor: auto; }
+  .cursor, .cursor-dot { display: none; }
+}
+</style>
+</head>
+<body>
+
+<div class="under-bg" aria-hidden="true"></div>
+<div class="frame" aria-hidden="true"></div>
+<div class="readout" aria-hidden="true"><b id="readoutSec">Cover</b><span class="readout-y" id="readoutY">Y 0</span><span class="readout-bar"><i id="readoutBar"></i></span><span id="readoutPct">0%</span></div>
+<div class="cursor"></div>
+<div class="cursor-dot"></div>
+
+<header class="topbar">
+  <div class="topbar-name">Park Dayoung</div>
+  <div></div>
+  <nav class="toc">
+    <a href="#top">Cover</a>
+    <a href="#works">Projects</a>
+    <a href="#about">About</a>
+    <a href="#contact">Contact</a>
+  </nav>
+</header>
+
+<!-- outside the fixed topbar so it scrolls away with the page -->
+<div class="topbar-title">
+  <div>Graphic · Motion · Space Design</div>
+  <div>Portfolio</div>
+</div>
+
+<div class="page">
+
+<!-- ═════════ COVER ═════════ -->
+<section class="cover">
+  <div class="cover-deco" aria-hidden="true">
+    <canvas class="about-dots" data-avoid=".cover-avoid" data-size="0.7"></canvas>
+    <div class="works-coord works-coord-tl">Cover / 00</div>
+    <div class="works-coord works-coord-tr">FRAME · CVR</div>
+    <div class="works-coord works-coord-bl">Δ DRAG TO SELECT</div>
+    <div class="works-coord works-coord-br">EOF · COVER</div>
+    <i class="guide-v" style="left: 3%"></i>
+    <i class="guide-v" style="left: 97%"></i>
+    <!-- registration marks at the middle of each edge, as on a print sheet -->
+    <i class="reg" style="top: 60px; left: 50%"></i>
+    <i class="reg" style="bottom: 60px; left: 50%"></i>
+    <i class="reg cover-reg-side" style="top: 50%; left: 60px"></i> <!-- JS lines the side pair up with the letters' middle -->
+    <i class="reg cover-reg-side" style="top: 50%; right: 60px"></i>
+  </div>
+  <div class="cover-stage">
+    <div class="stage-canvas" id="stage">
+
+      <div class="cover-avoid" aria-hidden="true"></div>
+      <div class="cover-marks" aria-hidden="true">
+        <div class="about-measure"><span></span></div>
+      </div>
+
+      <!-- Halftone dot letterforms (rendered by JS) — a blue shadow of ENTROPY -->
+      <div class="dot-block dot-e" data-letter="E"></div>
+      <div class="dot-block dot-n" data-letter="N"></div>
+      <div class="dot-block dot-t" data-letter="T"></div>
+      <div class="dot-block dot-r" data-letter="R"></div>
+      <div class="dot-block dot-o" data-letter="O"></div>
+      <div class="dot-block dot-p" data-letter="P"></div>
+      <div class="dot-block dot-y" data-letter="Y"></div>
+
+      <!-- Bounding boxes -->
+      <div class="bbox bbox--1">
+        <svg class="bbox-x" viewBox="0 0 100 100" preserveAspectRatio="none">
+          <line x1="0" y1="0" x2="100" y2="100"/>
+          <line x1="100" y1="0" x2="0" y2="100"/>
+        </svg>
+        <i class="bbox-handle tl"></i><i class="bbox-handle tr"></i>
+        <i class="bbox-handle bl"></i><i class="bbox-handle br"></i>
+      </div>
+
+      <h1 class="entropy-title" data-text="ENTROPY">
+        <span class="row row-1"><span class="letter"><span class="letter-glyph">E</span></span><span class="letter"><span class="letter-glyph">N</span></span><span class="letter"><span class="letter-glyph">T</span></span><span class="letter"><span class="letter-glyph">R</span></span></span>
+        <span class="row row-2"><span class="letter"><span class="letter-glyph">O</span></span><span class="letter"><span class="letter-glyph">P</span></span><span class="letter"><span class="letter-glyph">Y</span></span></span>
+      </h1>
+    </div>
+  </div>
+
+  <a href="#works" class="scroll-cue">Scroll to projects <span class="scroll-cue-arrow">↓</span></a>
+
+  <footer class="cover-foot">
+    <a href="mailto:daypark1001@gmail.com">daypark1001@gmail.com</a>
+    <div class="foot-ticker"><div class="foot-ticker-track" id="ticker"></div></div>
+    <div class="foot-time" id="clock">— : —</div>
+  </footer>
+</section>
+
+<!-- ═════════ DIVIDER 01 ═════════ -->
+<div class="divider" id="works">
+  <div class="divider-inner">
+    <b>§ 01</b>
+    <span>Section / Projects</span>
+    <span>Range / 2023–2025</span>
+    <span>Items / 11</span>
+    <b>33%</b>
+  </div>
+</div>
+
+<!-- ═════════ SELECTED WORKS (draggable arc) ═════════ -->
+<section class="works">
+  <div class="works-inner">
+  <div class="works-bg" aria-hidden="true">
+
+    <div class="works-coord works-coord-tl">Projects / 01</div>
+    <div class="works-coord works-coord-tr">FRAME · PRJ</div>
+    <div class="works-coord works-coord-bl">Δ DECOMPOSE</div>
+    <div class="works-coord works-coord-br">EOF · ARC</div>
+  </div>
+
+  <div class="pfilter" role="group" aria-label="Filter projects by field"></div>
+
+  <div class="pring" id="projectGrid">
+    <a href="works/01-inner-trailer.html" class="project-row" data-thumb="works/images/01/thumb.jpg" data-images="works/images/01/keyvisual.jpg, works/images/01/slide-01.webp, works/images/01/postcard-03.jpg, works/images/01/postcard-07.jpg, works/images/01/postcard-11.jpg, works/images/01/slide-06.webp, works/images/01/slide-07.webp, works/images/01/slide-09.webp" data-category="영상" data-overview="A trailer for 'INNER', a game planned as my graduation project, introducing its story and characters.">
+      <div class="project-row-num">01</div>
+      <div class="project-row-title">Game 'INNER' — Trailer<em>↗</em></div>
+      <div class="project-row-year">2025</div>
+    </a>
+    <a href="works/02-inner-popup.html" class="project-row" data-thumb="works/images/02/thumb.jpg" data-images="works/images/02/keyvisual.jpg, works/images/02/concept.jpg, works/images/02/ticket-pt1.jpg, works/images/02/ticket-pt2.jpg, works/images/02/ticket-pt3.jpg" data-category="공간 시각" data-overview="A pop-up store design that extends INNER's visuals into a real space with AI.">
+      <div class="project-row-num">02</div>
+      <div class="project-row-title">INNER Pop-up Store<em>↗</em></div>
+      <div class="project-row-year">2025</div>
+    </a>
+    <a href="works/03-renaissance-fair.html" class="project-row" data-thumb="works/images/03/thumb.jpg" data-images="works/images/03/keyvisual.jpg" data-category="영상" data-overview="A promotional film for the 'Renaissance Pleasure Fair', an American festival that recreates the Renaissance era.">
+      <div class="project-row-num">03</div>
+      <div class="project-row-title">Renaissance Pleasure Fair<em>↗</em></div>
+      <div class="project-row-year">2024</div>
+    </a>
+    <a href="works/04-back-in-black.html" class="project-row" data-thumb="works/images/04/thumb.jpg" data-images="works/images/04/keyvisual.jpg" data-category="영상" data-overview="A music video that reinterprets the energy of AC/DC's 'Back in Black' through red and bold graphics.">
+      <div class="project-row-num">04</div>
+      <div class="project-row-title">Back in Black<em>↗</em></div>
+      <div class="project-row-year">2024</div>
+    </a>
+    <a href="works/05-fuseseoul.html" class="project-row" data-thumb="works/images/05/thumb.jpg" data-images="works/images/05/keyvisual.jpg" data-category="영상" data-overview="A promotional film for the collaboration between FUSESEOUL and Geungnak Wangsaeng.">
+      <div class="project-row-num">05</div>
+      <div class="project-row-title">FUSESEOUL × Geungnak Wangsaeng<em>↗</em></div>
+      <div class="project-row-year">2023</div>
+    </a>
+    <a href="works/06-naver-google.html" class="project-row" data-thumb="works/images/06/thumb.gif, works/images/06/naver-card.gif" data-split="works/images/06/thumb.gif, works/images/06/naver-mobile.gif" data-category="시각" data-overview="Special Naver · Google logo designs celebrating Korean Traditional Music Day.">
+      <div class="project-row-num">06</div>
+      <div class="project-row-title">Naver &amp; Google — Logo<em>↗</em></div>
+      <div class="project-row-year">2024</div>
+    </a>
+    <a href="works/07-prism.html" class="project-row" data-thumb="works/images/07/thumb.jpg" data-images="works/images/07/ending.jpg" data-category="시각" data-overview="Main poster and visual identity for Sungshin Women's University's 2023 Sujeong Festival.">
+      <div class="project-row-num">07</div>
+      <div class="project-row-title">2023 Sujeong Festival PRISM<em>↗</em></div>
+      <div class="project-row-year">2023</div>
+    </a>
+    <a href="works/08-architectural-poster.html" class="project-row" data-thumb="works/images/08/thumb.jpg" data-images="works/images/08/gallery.jpg" data-category="시각" data-overview="A poster series guiding the Brutalist architecture along Gangnam-daero.">
+      <div class="project-row-num">08</div>
+      <div class="project-row-title">Architectural Poster Series<em>↗</em></div>
+      <div class="project-row-year">2024</div>
+    </a>
+    <a href="works/09-carol.html" class="project-row" data-thumb="works/images/09/thumb.jpg" data-images="works/images/09/moving-poster.mp4" data-category="시각 영상" data-overview="A moving poster paying homage to the winter scenes of the film &lt;Carol&gt;.">
+      <div class="project-row-num">09</div>
+      <div class="project-row-title">CAROL — Moving Poster<em>↗</em></div>
+      <div class="project-row-year">2024</div>
+    </a>
+    <a href="works/10-lilo-stitch.html" class="project-row" data-thumb="works/images/10/thumb.jpg" data-images="works/images/10/keyvisual.jpg" data-category="시각" data-overview="A typography project that rebuilds the 'Lilo &amp; Stitch' characters as a typeface.">
+      <div class="project-row-num">10</div>
+      <div class="project-row-title">Lilo &amp; Stitch — Typography<em>↗</em></div>
+      <div class="project-row-year">2023</div>
+    </a>
+    <a href="works/11-sungshin-mascot.html" class="project-row" data-thumb="works/images/11/thumb.jpg" data-category="시각" data-overview="A series of animal characters inspired by Sungshin Women's University students. Produced and sold as 2025 festival merchandise.">
+      <div class="project-row-num">11</div>
+      <div class="project-row-title">Sungshin Mascot Series<em>↗</em></div>
+      <div class="project-row-year">2025</div>
+    </a>
+  </div>
+  </div>
+</section>
+
+<!-- ═════════ DIVIDER 02 ═════════ -->
+<div class="divider" id="about">
+  <div class="divider-inner">
+    <b>§ 02</b>
+    <span>Section / About + Expertise</span>
+    <span>Frame / 0001</span>
+    <span>Status / Live</span>
+    <b>67%</b>
+  </div>
+</div>
+
+<!-- ═════════ ABOUT ═════════ -->
+<section class="about"> <!-- band stays solid over the pinned cover; its contents fade in -->
+  <div class="about-deco" aria-hidden="true">
+    <canvas class="about-dots"></canvas>
+    <div class="works-coord works-coord-tl">Hello / 02</div>
+    <div class="works-coord works-coord-tr">FRAME · ABT</div>
+    <div class="works-coord works-coord-bl">Δ COLLIDE</div>
+    <div class="works-coord works-coord-br">EOF · HELLO</div>
+    <i class="guide-v" style="left: 3%"></i>
+    <i class="guide-v" style="left: 97%"></i>
+    <!-- registration marks at the middle of each edge, as on a print sheet -->
+    <i class="reg" style="top: 60px; left: 50%"></i>
+    <i class="reg" style="bottom: 60px; left: 50%"></i>
+    <i class="reg reg-side" style="top: 50%; left: 60px"></i> <!-- JS lines the side pair up with the letters' middle -->
+    <i class="reg reg-side" style="top: 50%; right: 60px"></i>
+  </div>
+  <div class="about-inner reveal">
+    <div class="section-label">About / 02</div>
+    <div class="about-stage">
+    <div class="about-hello">
+      <div class="about-collide letters">
+        <span class="row">Let's</span>
+        <a class="row" href="mailto:daypark1001@gmail.com">collide.</a>
+        <div class="about-marks" aria-hidden="true">
+          <i class="crop tl"></i><i class="crop tr"></i><i class="crop bl"></i><i class="crop br"></i>
+          <div class="about-measure"><span></span></div>
+        </div>
+      </div>
+      <button type="button" class="scroll-cue" data-about-toggle>About me <span class="scroll-cue-arrow">→</span></button>
+    </div>
+    <div class="about-bento" inert>
+      <div class="bento-tile bento-intro">
+        <div class="section-label">Intro</div>
+        <div class="bento-big letters">Hi, I'm Dayoung.</div>
+        <div class="about-body">
+          <em>Entropy</em> is the shift where chaos gives rise to <em>new order</em> —
+          a pattern that surfaces even within unpredictable motion.
+          Through my own trials and collisions, I'm uncovering a rhythm and style that are unmistakably mine.
+          Built on that process of searching, I design new order out of change.
+        </div>
+      </div>
+      <div class="bento-tile bento-side">
+        <div class="section-label">Studio</div>
+        <div>
+          <div class="bento-big">Seoul, KR</div>
+          <a class="bento-links bento-mail" href="mailto:daypark1001@gmail.com">daypark1001@gmail.com ↗</a>
+        </div>
+      </div>
+      <div class="bento-tile bento-side">
+        <div class="section-label">Elsewhere</div>
+        <div class="bento-links">Instagram / @daypark.studio<br>Behance / dayoungpark<br>Vimeo / dayoung</div>
+      </div>
+      <div class="bento-tile bento-wide">
+        <div class="section-label">Field</div>
+        <div class="bento-fields">
+          <div><div class="field-head"><span>01</span><i>&#9654;</i></div><div class="bento-big">Motion</div><p>Designing the flow of emotion over time.</p></div>
+          <div><div class="field-head"><span>02</span><i>&#9679;</i></div><div class="bento-big">Graphic</div><p>Building messages through visual language.</p></div>
+          <div><div class="field-head"><span>03</span><i>&#9724;</i></div><div class="bento-big">Space</div><p>Designing the relationship between people and space.</p></div>
+          <div><div class="field-head"><span>04</span><i>&#9670;</i></div><div class="bento-big">Planning</div><p>From concept to execution, the backbone of a project.</p></div>
+        </div>
+      </div>
+      <button type="button" class="scroll-cue" data-about-toggle><span class="scroll-cue-arrow">←</span> Back</button>
+    </div>
+    </div>
+  </div>
+
+  <!-- ═════════ EXPERTISE (part of the about band) ═════════ -->
+  <div class="expertise reveal" id="expertise">
+  <div class="section-label">Expertise / 02</div>
+  <div class="expertise-grid">
+    <div class="expertise-card">
+      <span class="exp-icon">&#9654;</span>
+      <div class="exp-index">01</div>
+      <h3 class="exp-title">Motion</h3>
+      <p class="exp-desc">Designing the flow of emotion over time. From brand films and UI motion to exhibition video.</p>
+      <div class="exp-tools">
+        <span>After Effects</span>
+        <span>Cinema 4D</span>
+        <span>Premiere</span>
+      </div>
+    </div>
+    <div class="expertise-card">
+      <span class="exp-icon">&#9679;</span>
+      <div class="exp-index">02</div>
+      <h3 class="exp-title">Graphic</h3>
+      <p class="exp-desc">Building messages through visual language. Posters, branding and editorial design.</p>
+      <div class="exp-tools">
+        <span>Illustrator</span>
+        <span>Photoshop</span>
+        <span>InDesign</span>
+      </div>
+    </div>
+    <div class="expertise-card">
+      <span class="exp-icon">&#9724;</span>
+      <div class="exp-index">03</div>
+      <h3 class="exp-title">Space</h3>
+      <p class="exp-desc">Designing the relationship between people and space. Exhibitions, pop-ups and installations.</p>
+      <div class="exp-tools">
+        <span>SketchUp</span>
+        <span>Rhino</span>
+        <span>AutoCAD</span>
+      </div>
+    </div>
+    <div class="expertise-card">
+      <span class="exp-icon">&#9670;</span>
+      <div class="exp-index">04</div>
+      <h3 class="exp-title">Planning</h3>
+      <p class="exp-desc">From concept to execution, building the backbone of a project. Research, planning and directing.</p>
+      <div class="exp-tools">
+        <span>Figma</span>
+        <span>Notion</span>
+        <span>Miro</span>
+      </div>
+    </div>
+  </div>
+  </div>
+</section>
+
+<!-- ═════════ MARQUEE ═════════ -->
+<div class="marquee-strip" id="contact" aria-hidden="true">
+  <!-- one set only; JS repeats it to fill the screen and loops it seamlessly -->
+  <div class="marquee-track">
+    <span>GRAPHIC DESIGN<em>◆</em></span>
+    <span>MOTION DESIGN<em>◆</em></span>
+    <span>ORDER + NOISE<em>◆</em></span>
+    <span>PARK DAYOUNG<em>◆</em></span>
+  </div>
+</div>
+
+<!-- ═════════ DIVIDER 04 ═════════ -->
+<div class="divider">
+  <div class="divider-inner">
+    <b>§ 03</b>
+    <span>Section / Contact</span>
+    <span>End of file</span>
+    <span>EOF</span>
+    <b>100%</b>
+  </div>
+</div>
+
+<!-- ═════════ FOOTER / CONTACT ═════════ -->
+<footer class="foot">
+  <div class="foot-inner reveal">
+    <dl class="foot-side">
+      <dt>Email</dt>
+      <dd>daypark1001@gmail.com</dd>
+      <dt>Studio</dt>
+      <dd>Seoul, KR</dd>
+      <dt>Elsewhere</dt>
+      <dd>
+        Instagram / @daypark.studio<br>
+        Behance / dayoungpark<br>
+        Vimeo / dayoung
+      </dd>
+    </dl>
+    <div class="foot-bottom">
+      <div>© 2026 Park Dayoung — All rights reserved</div>
+      <div>Set in Archivo · Afacad Flux · Pretendard</div>
+    </div>
+  </div>
+</footer>
+
+</div>
+
+<script>
+/* ============================================================
+   1. Halftone letterforms — rasterize the real title font into dots
+   ============================================================ */
+// Rasterize the actual title font (Archivo 900 for the cover, Afacad Flux
+// 900 elsewhere — matching each section's .entropy-title / --display font)
+// into a coverage grid, so the halftone dots trace the real letterforms
+// instead of a hand-drawn pixel font.
+function rasterizeLetter(letter, cols, rows, fontFamily, stretch, baselineAt) {
+  const supersample = 4;
+  const cw = cols * supersample;
+  const ch = rows * supersample;
+  const canvas = document.createElement("canvas");
+  canvas.width = cw;
+  canvas.height = ch;
+  const ctx = canvas.getContext("2d");
+  ctx.fillStyle = "#000";
+  ctx.textAlign = "center";
+  ctx.textBaseline = "alphabetic";
+
+  // baselineAt: draw at true scale (box = 1.1em) on a fixed baseline, so x-height letters sit low like the real glyph;
+  // otherwise the glyph is fitted and centred (the cover's capitals)
+  let fontSize = baselineAt ? ch / 1.1 : ch * 0.92;
+  const setFont = () => {
+    ctx.font = `900 ${fontSize}px ${fontFamily}, sans-serif`;
+    if (stretch) ctx.fontStretch = stretch; // narrow letters (About's condensed Archivo)
+  };
+  setFont();
+  let metrics = ctx.measureText(letter);
+  while (metrics.width > cw * 0.92 && fontSize > 4) {
+    fontSize -= 2;
+    setFont();
+    metrics = ctx.measureText(letter);
+  }
+  const ascent = metrics.actualBoundingBoxAscent || fontSize * 0.72;
+  const descent = metrics.actualBoundingBoxDescent || fontSize * 0.02;
+  const baseline = baselineAt ? ch * baselineAt : (ch + ascent - descent) / 2;
+  ctx.fillText(letter, cw / 2, baseline);
+
+  const img = ctx.getImageData(0, 0, cw, ch).data;
+  const grid = [];
+  for (let ry = 0; ry < rows; ry++) {
+    const row = [];
+    for (let rx = 0; rx < cols; rx++) {
+      let sum = 0;
+      for (let sy = 0; sy < supersample; sy++) {
+        for (let sx = 0; sx < supersample; sx++) {
+          const px = rx * supersample + sx;
+          const py = ry * supersample + sy;
+          sum += img[(py * cw + px) * 4 + 3];
+        }
+      }
+      row.push(sum / (supersample * supersample * 255)); // 0..1 ink coverage
+    }
+    grid.push(row);
+  }
+  return grid;
+}
+
+function renderDots(el) {
+  const letter = el.dataset.letter;
+  if (!letter) return;
+  const cols = 26, rows = 34;
+  const fontFamily = "Archivo";
+  const grid = rasterizeLetter(letter, cols, rows, fontFamily, el.dataset.stretch, +el.dataset.baseline || 0);
+  const step = 5;
+  const maxR = 2.0; // base size at the letter's own center — grows via radial boost below
+  const w = cols * step;
+  const h = rows * step;
+  // radial character on top of the coverage screen: dots overlap and pack in
+  // tight near the letter's own center, then shrink and scatter loose toward
+  // its edges — softens the mechanical, perfectly-gridded look
+  const cx = (cols - 1) / 2;
+  const cy = (rows - 1) / 2;
+  const maxDist = Math.sqrt(cx * cx + cy * cy);
+  let circles = "";
+  for (let y = 0; y < rows; y++) {
+    for (let x = 0; x < cols; x++) {
+      const cov = grid[y][x];
+      if (cov < 0.06) continue; // skip empty space — no dot at all
+      const dist = maxDist ? Math.sqrt((x - cx) ** 2 + (y - cy) ** 2) / maxDist : 0; // 0 center → 1 rim
+      const radial = 1.55 - dist * 1.0; // >1 near center (dots overlap), <1 near the rim (dots shrink)
+      // classic halftone screening: dot area (so radius via sqrt) tracks ink coverage, scaled by radial
+      const r = maxR * Math.sqrt(cov) * radial * (0.85 + Math.random() * 0.3);
+      if (r < 0.3) continue;
+      const jitter = 0.15 + dist * 1.7; // tight/orderly at the core, loose scatter at the rim
+      const jx = (Math.random() - 0.5) * jitter;
+      const jy = (Math.random() - 0.5) * jitter;
+      circles += `<circle cx="${(x*step + step/2 + jx).toFixed(2)}" cy="${(y*step + step/2 + jy).toFixed(2)}" r="${r.toFixed(2)}"/>`;
+    }
+  }
+  el.innerHTML = `<svg viewBox="0 0 ${w} ${h}" preserveAspectRatio="xMidYMid meet">${circles}</svg>`;
+}
+
+function renderAllDots() {
+  document.querySelectorAll(".dot-block").forEach(renderDots);
+}
+
+// Wait for the title fonts to actually be loaded before rasterizing, otherwise
+// the canvas falls back to a system font and the dot shapes won't match the title.
+if (document.fonts && document.fonts.load) {
+  Promise.all([
+    document.fonts.load('900 100px "Afacad Flux"'),
+    document.fonts.load('900 100px Archivo')
+  ])
+    .then(() => document.fonts.ready)
+    .then(renderAllDots)
+    .catch(renderAllDots);
+} else {
+  renderAllDots();
+}
+
+/* ============================================================
+   2. Live clock (KST)
+   ============================================================ */
+function updateClock() {
+  const d = new Date();
+  const t = d.toLocaleTimeString("en-GB", { hour: "2-digit", minute: "2-digit", second: "2-digit" });
+  const el = document.getElementById("clock");
+  if (el) el.textContent = `${t} · KST`;
+}
+updateClock();
+setInterval(updateClock, 1000);
+
+/* ============================================================
+   3. Hex meta ticker
+   ============================================================ */
+function hex() { return Math.floor(Math.random() * 0xFFFF).toString(16).toUpperCase().padStart(4, "0"); }
+function buildTicker() {
+  const items = [
+    "ENTROPY · 2023—2025",
+    "GRAPHIC + MOTION DESIGN",
+    "PARK DAYOUNG · STUDIO",
+    "HALFTONE / DECOMPOSITION / NOISE",
+    "AVAILABLE Q3—Q4 2026",
+    "TDC TOKYO 2024 · HM",
+  ];
+  let parts = [];
+  for (let i = 0; i < 2; i++) {
+    items.forEach(s => {
+      parts.push(`<span>${s}</span>`);
+      parts.push(`<em>${hex()}·${hex()}</em>`);
+    });
+  }
+  document.getElementById("ticker").innerHTML = parts.join("");
+}
+buildTicker();
+setInterval(buildTicker, 8000);
+
+/* Marquee strip: repeat the set until one half covers the widest screen, then double it
+   so the -50% loop wraps with no gap. Duration follows width to keep a steady speed. */
+document.fonts.ready.then(function fillMarquee() {
+  const track = document.querySelector(".marquee-track");
+  const set = track.innerHTML;
+  while (track.scrollWidth < screen.width) track.insertAdjacentHTML("beforeend", set);
+  track.insertAdjacentHTML("beforeend", track.innerHTML);
+  const PX_PER_SEC = 40;
+  track.style.animationDuration = `${track.scrollWidth / 2 / PX_PER_SEC}s`;
+});
+
+/* Topbar turns white while the marquee strip is behind its text row */
+const topbar = document.querySelector(".topbar");
+const topbarRow = document.querySelector(".topbar-name");
+const darkStrip = document.querySelector(".marquee-strip");
+function updateTopbarTone() {
+  const s = darkStrip.getBoundingClientRect();
+  const r = topbarRow.getBoundingClientRect();
+  topbar.classList.toggle("on-dark", s.top < r.bottom && s.bottom > r.top);
+}
+addEventListener("scroll", updateTopbarTone, { passive: true });
+addEventListener("resize", updateTopbarTone);
+updateTopbarTone();
+
+/* u: 0 → 1 over the first screen of scroll. The cover shrinks slightly and fades out under the cards,
+   the page colour shifts, the projects strip and filter fade in.
+   Written straight onto those few elements (transform/opacity only): a CSS variable on <html>
+   would restyle the whole page, thousands of dot circles included, on every scroll frame. */
+const cover = document.querySelector(".cover");
+const underBg = document.querySelector(".under-bg");
+const fadeIns = document.querySelectorAll("#works, .works .pfilter, .works-bg");
+const coverStill =matchMedia("(prefers-reduced-motion: reduce)").matches;
+const setUnder = () => {
+  const u = Math.min(scrollY / innerHeight, 1);
+  cover.style.opacity = 1 - u;
+  if (!coverStill) cover.style.transform = `scale(${1 - u * 0.06})`;
+  underBg.style.opacity = u;
+  const f = Math.min(Math.max((u - 0.6) * 2.5, 0), 1);
+  fadeIns.forEach(el => el.style.opacity = f);
+};
+addEventListener("scroll", setUnder, { passive: true });
+setUnder();
+
+/* Scroll stops once at the top of Projects (either direction): crossing it snaps
+   there and holds until the current wheel / trackpad gesture has ended.
+   Menu links skip the stop, so jumping to About still goes straight through. */
+(() => {
+  const works = document.getElementById("works");
+  let lastY = scrollY, holdUntil = 0, skipUntil = 0;
+  const stopY = () => works.getBoundingClientRect().top + scrollY;
+  addEventListener("scroll", () => {
+    const y = scrollY, T = stopY(), now = performance.now();
+    if (now < holdUntil) { // pinned: undo any drift (a smooth-scroll animation still running, momentum)
+      if (Math.abs(y - T) >= 1) scrollTo({ top: T, behavior: "instant" });
+      lastY = T;
+      return;
+    }
+    const landed = Math.abs(y - T) < 1, crossed = (lastY - T) * (y - T) < 0;
+    if (now > skipUntil && Math.abs(lastY - T) >= 1 && (landed || crossed)) {
+      if (!landed) scrollTo({ top: T, behavior: "instant" });
+      holdUntil = now + 600;
+      addEventListener("wheel", swallow, { passive: false });
+      lastY = T;
+      return;
+    }
+    lastY = y;
+  }, { passive: true });
+  // while holding, swallow the rest of the gesture (trackpad inertia keeps sending wheel events).
+  // Attached only during the hold: a permanent non-passive wheel listener makes every scroll wait on JS
+  function swallow(e) {
+    const now = performance.now();
+    if (now < holdUntil) { holdUntil = Math.max(holdUntil, now + 150); e.preventDefault(); }
+    else removeEventListener("wheel", swallow);
+  }
+  // cover → Projects → About → Contact: between them, the first nudge glides to the next / previous one.
+  // Listeners sit only on those areas, so the rest of the page stays non-blocking
+  const marks = [document.getElementById("about"), document.getElementById("contact")];
+  let gliding = false;
+  const glide = e => {
+    const y = scrollY, maxY = document.documentElement.scrollHeight - innerHeight;
+    const stops = [0, stopY(), ...marks.map(m => Math.min(m.getBoundingClientRect().top + scrollY, maxY))];
+    if (y > stops.at(-1) + 1) return; // past Contact: normal scroll
+    const to = e.deltaY > 0 ? stops.find(t => t > y + 1) : e.deltaY < 0 ? stops.findLast(t => t < y - 1) : undefined;
+    if (to === undefined || performance.now() < holdUntil) return; // during the hold, swallow() handles it
+    e.preventDefault(); // the glide owns the scroll; extra ticks / inertia would fight it
+    if (gliding) return;
+    gliding = true;
+    scrollTo({ top: to, behavior: "smooth" });
+    setTimeout(() => gliding = false, 1200);
+  };
+  document.querySelectorAll(".cover, #works, .works, #about, .about, #contact, #contact ~ *").forEach(el => el.addEventListener("wheel", glide, { passive: false }));
+  document.addEventListener("click", e => { if (e.target.closest('a[href^="#"]')) skipUntil = performance.now() + 1500; });
+})();
+
+/* About: "Let's collide." flies in once the stage is in view; the button swaps it for the bento
+   (letters fly off, tiles fly up), Back swaps it back. Once the stage has fully left, reset so the next visit replays it */
+(() => {
+  const stage = document.querySelector(".about-stage"), collide = stage.querySelector(".about-collide");
+  const hello = stage.querySelector(".about-hello"), bento = stage.querySelector(".about-bento");
+  const setOpen = open => {
+    stage.classList.toggle("is-open", open);
+    hello.inert = open;
+    bento.inert = !open;
+  };
+  stage.querySelectorAll("[data-about-toggle]").forEach(b => b.addEventListener("click", () => {
+    const open = !stage.classList.contains("is-open");
+    setOpen(open);
+    (open ? bento : hello).querySelector("[data-about-toggle]").focus({ preventScroll: true });
+  }));
+  [...bento.children].forEach((t, n) => t.style.setProperty("--i", n));
+  // one span per letter; each letter carries a halftone dot shadow like the cover's ENTROPY
+  // (drawn by renderAllDots once the fonts load, which always runs after this)
+  // spaces stay plain text so words can still break; --i counts letters per element.
+  // Uppercased text (collide) gets capital dot shapes centred in the box; mixed case (the intro heading)
+  // keeps its own letters, sat on the baseline so lowercase dots line up with their glyphs
+  const split = (node, c = { i: 0, upper: getComputedStyle(node).textTransform === "uppercase" }) => [...node.childNodes].forEach(n => {
+    if (n.nodeType !== 3) return n.classList?.contains("about-marks") || split(n, c);
+    n.replaceWith(...[...n.textContent.trim()].map(ch => {
+      if (ch === " ") return document.createTextNode(" ");
+      const i = c.i++;
+      const s = document.createElement("span");
+      s.className = "ch";
+      s.textContent = ch;
+      s.style.setProperty("--i", i);
+      if (/[a-z]/i.test(ch)) {
+        const d = document.createElement("span");
+        d.className = "dot-block";
+        d.dataset.letter = c.upper ? ch.toUpperCase() : ch;
+        if (!c.upper) d.dataset.baseline = "0.8"; // baseline at 80% of the 1.1em box (Archivo ascent/descent, any line-height)
+        d.dataset.stretch = "extra-condensed";
+        d.setAttribute("aria-hidden", "true");
+        s.append(d);
+      }
+      return s;
+    }));
+  });
+  stage.querySelectorAll(".letters").forEach(el => split(el));
+  // dimension line reads the letters' real rendered size, like a design tool's selection readout
+  const dim = collide.querySelector(".about-measure span");
+  // …and the side registration marks sit level with the letters' middle (offsets, so the reveal's slide-in doesn't skew it)
+  const sideRegs = document.querySelectorAll(".reg-side");
+  const measure = () => {
+    dim.textContent = `W ${collide.offsetWidth} · H ${collide.offsetHeight} PX`;
+    let y = collide.offsetHeight / 2;
+    for (let el = collide; el && !el.classList.contains("about"); el = el.offsetParent) y += el.offsetTop; // up to .about, the backdrop's origin
+    sideRegs.forEach(r => r.style.top = y + "px");
+    // the intro heading's letters start over the description (both share the stage as offsetParent)
+    const hi = stage.querySelector(".bento-intro .letters"), body = stage.querySelector(".bento-intro .about-body");
+    hi.style.setProperty("--rise", (body.offsetTop + body.offsetHeight / 2) - (hi.offsetTop + hi.offsetHeight / 2) + "px");
+  };
+  measure();
+  addEventListener("resize", measure);
+  document.fonts?.ready.then(measure); // the condensed face changes the width once it loads
+  if (matchMedia("(prefers-reduced-motion: reduce)").matches) { stage.classList.add("is-in"); return; }
+  new IntersectionObserver(([e]) => {
+    if (e.intersectionRatio >= 0.35) stage.classList.add("is-in");
+    else if (!e.isIntersecting) { stage.classList.remove("is-in"); setOpen(false); }
+  }, { threshold: [0, 0.35] }).observe(stage);
+})();
+
+/* About backdrop: halftone dot clusters drift across the screen; when two meet they bounce apart
+   and their dots scatter, then spring back into shape (chaos → order). The pointer pushes dots away.
+   Runs only while About is on screen; with reduced motion it draws one still frame */
+document.querySelectorAll(".about-dots").forEach(canvas => { // About's backdrop and the cover's
+  const ctx = canvas.getContext("2d");
+  const avoidEl = canvas.dataset.avoid && document.querySelector(canvas.dataset.avoid);
+  const SIZE = +canvas.dataset.size || 1; // cover: smaller clusters, so they fit the gaps around the title
+  const still = matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const COUNT = 6, STEP = 9, PUSH = 110; // clusters, dot pitch, pointer reach (px)
+  let W = 0, H = 0, clusters = [], running = false, mx = -1e4, my = -1e4;
+
+  const makeCluster = () => {
+    const R = (50 + Math.random() * 70) * SIZE, dots = [];
+    for (let y = -R; y <= R; y += STEP) for (let x = -R; x <= R; x += STEP) {
+      const d = Math.hypot(x, y) / R;
+      if (d > 1) continue;
+      dots.push({ ox: x, oy: y, x, y, vx: 0, vy: 0, r: 0.5 + 3 * (1 - d) ** 0.8 }); // big at the core, fine at the rim
+    }
+    // born along the top or bottom edge (alternating), drifting inward toward the middle
+    const top = (n++ % 2) === 0;
+    return { R, dots, cx: R + Math.random() * (W - 2 * R), cy: top ? R : H - R,
+             vx: (Math.random() - 0.5) * 0.7, vy: (top ? 1 : -1) * (0.2 + Math.random() * 0.35) };
+  };
+  let n = 0;
+  const resize = () => {
+    const dpr = Math.min(devicePixelRatio || 1, 2);
+    const oldW = W;
+    W = canvas.clientWidth; H = canvas.clientHeight;
+    canvas.width = W * dpr; canvas.height = H * dpr;
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    if (W !== oldW) clusters = Array.from({ length: COUNT }, makeCluster); // height-only resizes (mobile toolbar) keep them
+    draw();
+  };
+
+  const step = () => {
+    for (const c of clusters) {
+      c.cx += c.vx; c.cy += c.vy;
+      if (c.cx < c.R || c.cx > W - c.R) { c.vx *= -1; c.cx = Math.min(Math.max(c.cx, c.R), W - c.R); }
+      if (c.cy < c.R || c.cy > H - c.R) { c.vy *= -1; c.cy = Math.min(Math.max(c.cy, c.R), H - c.R); }
+    }
+    // data-avoid (cover): clusters bounce off that element's box like a wall, so they never drift over the title
+    if (avoidEl) {
+      const a = avoidEl.getBoundingClientRect(), o = canvas.getBoundingClientRect();
+      const M = 34; // keep clear of the crop marks too
+      const L = a.left - o.left - M, T = a.top - o.top - M, Rr = a.right - o.left + M, B = a.bottom - o.top + M;
+      for (const c of clusters) {
+        const px = Math.min(Math.max(c.cx, L), Rr), py = Math.min(Math.max(c.cy, T), B); // nearest point on the box
+        let nx = c.cx - px, ny = c.cy - py, d = Math.hypot(nx, ny);
+        if (d >= c.R) continue;
+        if (d === 0) { // centre inside the box: leave by the nearest side
+          const m = Math.min(c.cx - L, Rr - c.cx, c.cy - T, B - c.cy);
+          [nx, ny] = m === c.cx - L ? [-1, 0] : m === Rr - c.cx ? [1, 0] : m === c.cy - T ? [0, -1] : [0, 1];
+          c.cx = nx ? (nx < 0 ? L : Rr) : c.cx; c.cy = ny ? (ny < 0 ? T : B) : c.cy; d = 0;
+        } else { nx /= d; ny /= d; }
+        c.cx += nx * (c.R - d); c.cy += ny * (c.R - d);
+        const vn = c.vx * nx + c.vy * ny;
+        if (vn < 0) { c.vx -= 2 * vn * nx; c.vy -= 2 * vn * ny; }
+      }
+    }
+    // collisions: equal-mass bounce along the line between centres, plus a scatter kick to both clusters' dots
+    for (let i = 0; i < clusters.length; i++) for (let j = i + 1; j < clusters.length; j++) {
+      const a = clusters[i], b = clusters[j];
+      const dx = b.cx - a.cx, dy = b.cy - a.cy, dist = Math.hypot(dx, dy) || 1;
+      if (dist > (a.R + b.R) * 0.8) continue;
+      const nx = dx / dist, ny = dy / dist, rel = (b.vx - a.vx) * nx + (b.vy - a.vy) * ny;
+      if (rel >= 0) continue; // already moving apart
+      a.vx += rel * nx; a.vy += rel * ny; b.vx -= rel * nx; b.vy -= rel * ny;
+      for (const d of [...a.dots, ...b.dots]) { d.vx += (Math.random() - 0.5) * 9; d.vy += (Math.random() - 0.5) * 9; }
+    }
+    for (const c of clusters) for (const d of c.dots) {
+      const px = c.cx + d.x - mx, py = c.cy + d.y - my, pd = Math.hypot(px, py);
+      if (pd < PUSH && pd > 0) { const f = (1 - pd / PUSH) * 1.6; d.vx += px / pd * f; d.vy += py / pd * f; }
+      d.vx = (d.vx + (d.ox - d.x) * 0.02) * 0.9; // spring home, damped
+      d.vy = (d.vy + (d.oy - d.y) * 0.02) * 0.9;
+      d.x += d.vx; d.y += d.vy;
+    }
+  };
+  function draw() {
+    ctx.clearRect(0, 0, W, H);
+    ctx.fillStyle = "rgba(31, 61, 240, 0.22)"; // --blue, kept faint so the letters stay on top
+    ctx.beginPath();
+    for (const c of clusters) for (const d of c.dots) {
+      ctx.moveTo(c.cx + d.x + d.r, c.cy + d.y);
+      ctx.arc(c.cx + d.x, c.cy + d.y, d.r, 0, Math.PI * 2);
+    }
+    ctx.fill();
+  }
+  const loop = () => { if (!running) return; step(); draw(); requestAnimationFrame(loop); };
+
+  addEventListener("pointermove", e => { const r = canvas.getBoundingClientRect(); mx = e.clientX - r.left; my = e.clientY - r.top; }, { passive: true });
+  addEventListener("resize", resize);
+  resize();
+  if (still) return;
+  new IntersectionObserver(([e]) => {
+    if (e.isIntersecting === running) return;
+    running = e.isIntersecting;
+    if (running) loop();
+  }).observe(canvas);
+});
+
+/* cover: crop marks fitted around the whole graphic (letters + red boxes), so they never land on a box;
+   size written on the baseline, side registration marks level with its middle.
+   .cover-avoid is the letters' own box, which the drifting dots bounce off */
+(() => {
+  const box = document.getElementById("stage"), marks = box.querySelector(".cover-marks"), avoid = box.querySelector(".cover-avoid");
+  const dim = marks.querySelector(".about-measure span"), deco = document.querySelector(".cover-deco");
+  const sideRegs = document.querySelectorAll(".cover-reg-side");
+  // union of the matched elements' real boxes (rows are shifted, so read rects), in viewport px
+  const union = sel => {
+    const u = { l: Infinity, t: Infinity, r: -Infinity, b: -Infinity };
+    box.querySelectorAll(sel).forEach(e => {
+      const g = e.getBoundingClientRect();
+      u.l = Math.min(u.l, g.left); u.t = Math.min(u.t, g.top); u.r = Math.max(u.r, g.right); u.b = Math.max(u.b, g.bottom);
+    });
+    return u;
+  };
+  const place = (el, l, t, w, h, b, s) =>
+    Object.assign(el.style, { left: (l - b.left) / s + "px", top: (t - b.top) / s + "px", width: w / s + "px", height: h / s + "px" });
+  let shift = 0;
+  const measure = () => {
+    // centre the letters first: nudge the whole graphic by the gap between their middle and the screen middle
+    const L0 = union(".entropy-title .letter"), s0 = box.getBoundingClientRect().width / box.offsetWidth || 1;
+    shift += (document.documentElement.clientWidth / 2 - (L0.l + L0.r) / 2) / s0;
+    box.style.transform = `translateX(${shift}px)`;
+    const b = box.getBoundingClientRect(), s = b.width / box.offsetWidth || 1; // undo the cover's scroll scale
+    const L = union(".entropy-title .letter");
+    place(avoid, L.l, L.t, L.r - L.l, L.b - L.t, b, s);
+    // each dot shadow sits on its own letter (same order, E…Y), nudged down-right (0.14em, 0.12em), a bit wider than About's 0.06em;
+    // box = 1.1em tall at the 26×34 dot grid's aspect
+    const em = parseFloat(getComputedStyle(box.querySelector(".entropy-title")).fontSize) * s;
+    const glyphs = box.querySelectorAll(".entropy-title .letter");
+    box.querySelectorAll(":scope > .dot-block").forEach((d, i) => {
+      const g = glyphs[i].getBoundingClientRect(), h = 1.1 * em, w = h * 26 / 34;
+      place(d, (g.left + g.right) / 2 - w / 2 + 0.14 * em, (g.top + g.bottom) / 2 - h / 2 + 0.12 * em, w, h, b, s);
+    });
+    // measured box = the letters, as on About (the red boxes start at zero size in the intro, so they can't be read here)
+    const cy = (L.t + L.b) / 2;
+    place(marks, L.l, L.t, L.r - L.l, L.b - L.t, b, s);
+    dim.textContent = `W ${Math.round((L.r - L.l) / s)} · H ${Math.round((L.b - L.t) / s)} PX`;
+    const y = (cy - deco.getBoundingClientRect().top) / s;
+    sideRegs.forEach(el => el.style.top = y + "px");
+    // red boxes wrap real letters, as if each were a selection in a design tool (vars, so the intro can still collapse them)
+    const pad = 0.07 * em;
+    bboxes.forEach((bx, k) => {
+      const r = groups[k].map(i => glyphs[i].getBoundingClientRect());
+      const l = Math.min(...r.map(g => g.left)) - pad, t = Math.min(...r.map(g => g.top)) - pad;
+      const w = Math.max(...r.map(g => g.right)) + pad - l, h = Math.max(...r.map(g => g.bottom)) + pad - t;
+      // on the stage, so the box and the title's clip (both stage-sized coords) read the same values
+      box.style.setProperty("--x", (l - b.left) / s + "px"); box.style.setProperty("--y", (t - b.top) / s + "px");
+      box.style.setProperty("--w", w / s + "px"); box.style.setProperty("--h", h / s + "px");
+    });
+  };
+  const cover = document.querySelector(".cover"), letters = [...box.querySelectorAll(".entropy-title .letter")];
+  const bboxes = [...box.querySelectorAll(".bbox")], groups = [[0, 1, 2, 3, 4, 5, 6]]; // one box around all of ENTROPY, dragged out in a single pass
+  const shadows = [...box.querySelectorAll(":scope > .dot-block")];
+  // a box's letters (and their dot shadows) appear one after another
+  const reveal = idx => idx.forEach((i, j) => setTimeout(() => { letters[i].classList.add("is-shown"); shadows[i]?.classList.add("is-shown"); }, j * 80));
+  // "selected": the letters turn blue and sway (the hover effect), then settle
+  const pick = els => els.forEach(l => {
+    l.classList.remove("is-picked"); void l.offsetWidth; l.classList.add("is-picked");
+    clearTimeout(l._pick); l._pick = setTimeout(() => l.classList.remove("is-picked"), 1400);
+  });
+  // intro: when the cursor finishes dragging a box, its letters appear inside it; after the last one, boxes just follow resizes
+  let drawn = 0;
+  bboxes.forEach((bx, k) => bx.addEventListener("transitionend", e => {
+    if (e.target !== bx || e.propertyName !== "width" || cover.classList.contains("intro-done")) return;
+    reveal(groups[k]);
+    setTimeout(() => bx.classList.add("is-gone"), 1100); // letters drawn in, then the box goes
+    if (++drawn === bboxes.length) cover.classList.add("intro-done");
+  }));
+  measure();
+  addEventListener("resize", measure);
+
+  // visitors can drag their own red selection box on the cover (mouse only, so touch still scrolls);
+  // letters it touches light up while dragging and sway on release
+  let m = null, x0 = 0, y0 = 0;
+  const drag = e => {
+    const x = Math.min(x0, e.clientX), y = Math.min(y0, e.clientY), w = Math.abs(e.clientX - x0), h = Math.abs(e.clientY - y0);
+    Object.assign(m.style, { left: x + "px", top: y + "px", width: w + "px", height: h + "px" });
+    m.firstChild.textContent = `W ${Math.round(w)} · H ${Math.round(h)}`;
+    letters.forEach(l => {
+      const r = l.getBoundingClientRect();
+      l.classList.toggle("is-sel", r.left < x + w && r.right > x && r.top < y + h && r.bottom > y);
+    });
+  };
+  cover.addEventListener("pointerdown", e => {
+    if (e.pointerType !== "mouse" || e.button !== 0 || e.target.closest("a, button")) return;
+    e.preventDefault(); // no text selection
+    x0 = e.clientX; y0 = e.clientY;
+    m = document.createElement("div");
+    m.className = "marquee-sel";
+    m.innerHTML = "<span></span>";
+    document.body.append(m);
+    drag(e);
+  });
+  addEventListener("pointermove", e => { if (m) drag(e); });
+  addEventListener("pointerup", () => {
+    if (!m) return;
+    const sel = letters.filter(l => l.classList.contains("is-sel"));
+    sel.forEach(l => l.classList.remove("is-sel"));
+    pick(sel);
+    const el = m; m = null;
+    // the box stays while its letters sway (1.4s), then fades out
+    setTimeout(() => el.classList.add("is-done"), sel.length ? 1400 : 0);
+    setTimeout(() => el.remove(), (sel.length ? 1400 : 0) + 400);
+  });
+  // intro: stagger index per layer, then play once the fonts (and so the dot shapes and positions) are in
+  document.querySelectorAll("#stage .bbox").forEach(b => b.insertAdjacentHTML("beforeend", "<i class=\"bbox-cursor\"></i>"));
+  ["#stage .letter", "#stage > .dot-block", "#stage .bbox"].forEach(sel =>
+    document.querySelectorAll(sel).forEach((el, i) => el.style.setProperty("--i", i)));
+  const still = matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const play = () => {
+    measure();
+    if (still) { reveal(letters.map((_, i) => i)); bboxes.forEach(bx => bx.classList.add("is-gone")); } // no drag to wait for
+    requestAnimationFrame(() => cover.classList.add("is-in"));
+  };
+  document.fonts ? document.fonts.ready.then(play) : play();
+})();
+
+/* ============================================================
+   4. Reveal on scroll
+   ============================================================ */
+const io = new IntersectionObserver((entries) => {
+  entries.forEach(e => { if (e.isIntersecting) e.target.classList.add("in"); });
+}, { threshold: 0.1 });
+document.querySelectorAll(".reveal").forEach(el => io.observe(el));
+
+/* ============================================================
+   5. Mouse parallax for stage layers
+   ============================================================ */
+const stage = document.getElementById("stage");
+const dots = stage ? stage.querySelectorAll(".dot-block") : [];
+const boxes = stage ? stage.querySelectorAll(".bbox") : [];
+if (stage) {
+  let tx = 0, ty = 0, cx = 0, cy = 0;
+  document.addEventListener("mousemove", (e) => {
+    const rect = stage.getBoundingClientRect();
+    tx = (e.clientX - rect.left - rect.width/2)  / rect.width;
+    ty = (e.clientY - rect.top  - rect.height/2) / rect.height;
+  });
+  function tick() {
+    cx += (tx - cx) * 0.06;
+    cy += (ty - cy) * 0.06;
+    dots.forEach((b, i) => {
+      const f = (i + 1) * 6;
+      b.style.transform = `translate(${cx * f}px, ${cy * f}px)`;
+    });
+    requestAnimationFrame(tick);
+  }
+  tick();
+}
+
+/* ============================================================
+   6. Bounding box random nudge (B motion: tracking jitter)
+   ============================================================ */
+boxes.forEach((box, i) => {
+  setInterval(() => {
+    const dx = (Math.random() - 0.5) * 8;
+    const dy = (Math.random() - 0.5) * 8;
+    const sx = 1 + (Math.random() - 0.5) * 0.025;
+    box.style.transform  = `translate(${dx}px, ${dy}px) scale(${sx})`;
+  }, 1700 + i * 230);
+});
+
+/* ============================================================
+   7. Custom cursor
+   ============================================================ */
+const cursor = document.querySelector(".cursor");
+const cursorDot = document.querySelector(".cursor-dot");
+if (cursor && window.matchMedia("(pointer:fine)").matches) {
+  let mx = window.innerWidth/2, my = window.innerHeight/2;
+  let dx = mx, dy = my;
+  let hoverScale = 1, hoverScaleTarget = 1;
+  document.addEventListener("mousemove", (e) => { mx = e.clientX; my = e.clientY; });
+  // delegated, since the project ring builds its cards later
+  document.addEventListener("mouseover", (e) => {
+    const on = !!e.target.closest(".pcard, .expertise-card");
+    hoverScaleTarget = on ? 2.6 : 1;
+    cursor.style.opacity = on ? "0.35" : "1";
+  });
+  function loop() {
+    dx += (mx - dx) * 0.18;
+    dy += (my - dy) * 0.18;
+    hoverScale += (hoverScaleTarget - hoverScale) * 0.2;
+    cursor.style.transform = `translate(${mx}px, ${my}px) translate(-50%, -50%)`;
+    cursorDot.style.transform = `translate(${dx}px, ${dy}px) translate(-50%, -50%) scale(${hoverScale})`;
+    requestAnimationFrame(loop);
+  }
+  loop();
+}
+
+/* ============================================================
+   8. Project ring — the <a> list in #projectGrid is the data;
+   it is rebuilt as a turning wheel of cards (repeated to fill
+   the circle). Click a card: its images fan out as a 3D stack.
+   ============================================================ */
+(() => {
+  const ring = document.getElementById("projectGrid");
+  if (!ring) return;
+  const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const MIN_SLOTS = 20; // cards around the circle; the project list repeats to reach it
+
+  const projects = [...ring.querySelectorAll("a")].map(a => ({
+    href: a.getAttribute("href"),
+    num: a.querySelector(".project-row-num").textContent.trim(),
+    title: a.querySelector(".project-row-title").firstChild.textContent.trim(),
+    year: a.querySelector(".project-row-year").textContent.trim(),
+    overview: a.dataset.overview || "",
+    cats: (a.dataset.category || "").split(/\s+/),
+    thumb: (t => t.length > 1 ? t : t[0])((a.dataset.thumb || "").split(",").map(s => s.trim()).filter(Boolean)), // several = layered on the card
+    images: (a.dataset.images || "").split(",").map(s => s.trim()).filter(Boolean),
+    split: (a.dataset.split || "").split(",").map(s => s.trim()).filter(Boolean), // shown together: stacked on the card, side by side elsewhere
+  }));
+
+  const el = (tag, cls, text) => { const e = document.createElement(tag); if (cls) e.className = cls; if (text != null) e.textContent = text; return e; };
+  const placeholder = p => { const ph = el("div", "pcard-ph"); ph.append(el("span", "", `${p.num} · ${p.year}`), el("b", "", p.title)); return ph; };
+  const isVideo = src => typeof src === "string" && /\.mp4$/i.test(src);
+  const picture = (src, p, lazy = true) => {
+    if (isVideo(src)) { const v = el("video"); v.muted = v.loop = v.autoplay = v.playsInline = true; v.src = src; return v; } // silent loop
+    if (!src) return placeholder(p); const img = el("img"); img.src = src; img.alt = ""; img.decoding = "async"; if (lazy) img.loading = "lazy"; return img; };
+  // one picture, or the project's split group in a .psplit box; an array src is a split group
+  const pictures = (src, p, lazy = true) => {
+    if (!Array.isArray(src)) return picture(src, p, lazy);
+    const g = el("div", "psplit");
+    src.forEach(s => g.append(picture(s, p, lazy)));
+    return g;
+  };
+
+  ring.textContent = "";
+  ring.classList.add("pring");
+  const wheel = el("div", "pring-wheel"), spin = el("div", "pring-spin");
+  wheel.append(spin);
+  const caption = el("div", "pring-caption");
+  const capTitle = el("b", "pring-title");
+  caption.append(el("span", "pring-kicker", "drag to rotate · click to open"), capTitle);
+  const stack = el("div", "pstack"), layers = el("div", "pstack-layers"), info = el("div", "pstack-info");
+  stack.append(layers, info);
+  ring.append(wheel, caption, stack);
+
+  let cards = [], step = 360, rot = 0, topCard = null, isOpen = false, hovering = false, visible = false, R = 640;
+
+  function build() {
+    const list = projects;
+    const reps = Math.ceil(MIN_SLOTS / list.length);
+    spin.textContent = "";
+    cards = [];
+    for (let r = 0; r < reps; r++) list.forEach(p => {
+      const c = el("a", "pcard");
+      c.href = p.href;
+      c.setAttribute("aria-label", p.title);
+      if (r > 0) { c.tabIndex = -1; c.setAttribute("aria-hidden", "true"); } // repeats are decoration
+      c.append(pictures(p.thumb || (p.split.length ? p.split : p.images[0]), p, false)); // eager: decoding mid-zoom would stutter
+      c._p = p;
+      spin.append(c);
+      cards.push(c);
+    });
+    step = 360 / cards.length;
+    cards.forEach((c, i) => c.style.setProperty("--a", i * step + "deg")); // fixed slots; the spin layer turns them all
+    topCard = null;
+    render();
+  }
+
+  function layout() {
+    const small = ring.clientWidth < 700;
+    const ch = small ? 146 : 234;
+    R = small ? 380 : 760;
+    ring.style.setProperty("--r", R + "px");
+    ring.style.setProperty("--dy", (ch / 2 + 60 + R - ring.clientHeight / 2) + "px"); // top card near the top edge
+  }
+
+  function render() {
+    let best = 999;
+    spin.style.transform = `rotate(${rot}deg)`;
+    cards.forEach((c, i) => {
+      const a = i * step + rot;
+      const d = Math.abs((((a % 360) + 540) % 360) - 180);
+      if (d < best) { best = d; topCard = c; }
+    });
+    showCaption(hoverCard || topCard);
+  }
+
+  // caption names the hovered card, or the top one when nothing is hovered
+  let hoverCard = null;
+  function showCaption(c) {
+    if (!c) return;
+    capTitle.textContent = c._p.title;
+    caption.classList.toggle("is-dim", c.classList.contains("is-dim"));
+  }
+
+  /* field filter: buttons built from data-category; label → category value */
+  const filterBar = document.querySelector(".pfilter");
+  if (filterBar) {
+    const fields = [["All", null], ["Graphic", "시각"], ["Motion", "영상"], ["Space", "공간"]];
+    fields.forEach(([label, cat], i) => {
+      const b = el("button", "", label);
+      b.type = "button";
+      b.setAttribute("aria-pressed", i === 0);
+      b.addEventListener("click", () => {
+        filterBar.querySelectorAll("button").forEach(x => x.setAttribute("aria-pressed", x === b));
+        cards.forEach(c => c.classList.toggle("is-dim", !!cat && !c._p.cats.includes(cat)));
+        render();
+      });
+      filterBar.append(b);
+    });
+  }
+
+  // cards fly in once the section is in view; once it has fully left, reset so the next visit replays it
+  let landTimer;
+  function play() {
+    if (reduce) { ring.classList.add("is-in"); return; }
+    cards.forEach((c, i) => {
+      const d = ((((i * step + rot) % 360) + 540) % 360) - 180; // signed angle from the top, + = right
+      c.style.setProperty("--tilt", (d < 0 ? -1 : 1) * (18 + Math.min(Math.abs(d), 40)) + "deg");
+      c.style.setProperty("--delay", (Math.min(Math.max((d + 60) / 120, 0), 1) * 0.7).toFixed(2) + "s"); // left → right
+    });
+    ring.classList.add("is-in", "is-landing");
+    clearTimeout(landTimer);
+    landTimer = setTimeout(() => ring.classList.remove("is-landing"), 1900); // drop the delays so filter dimming stays instant
+  }
+  new IntersectionObserver(([e]) => {
+    visible = e.isIntersecting;
+    if (e.intersectionRatio >= 0.35 && !ring.classList.contains("is-in")) play();
+    if (!visible) { clearTimeout(landTimer); ring.classList.remove("is-in", "is-landing"); }
+  }, { threshold: [0, 0.35] }).observe(ring);
+
+  /* drag / horizontal wheel to turn */
+  let dragging = false, moved = false, startX = 0, startRot = 0;
+  ring.addEventListener("pointerdown", e => {
+    if (isOpen || e.button !== 0) return;
+    dragging = true; moved = false; startX = e.clientX; startRot = rot;
+    ring.classList.add("dragging");
+  });
+  addEventListener("pointermove", e => {
+    if (!dragging) return;
+    const dx = e.clientX - startX;
+    if (Math.abs(dx) > 5) moved = true;
+    rot = startRot + dx * 180 / (Math.PI * R); // card under the pointer follows it
+    render();
+  });
+  addEventListener("pointerup", () => { dragging = false; ring.classList.remove("dragging"); });
+  ring.addEventListener("dragstart", e => e.preventDefault());
+  ring.addEventListener("wheel", e => {
+    if (isOpen || Math.abs(e.deltaX) <= Math.abs(e.deltaY)) return;
+    e.preventDefault();
+    rot -= e.deltaX * 0.05;
+    render();
+  }, { passive: false });
+  // pause only while the pointer is on a card, not anywhere in the ring area
+  // section background shows the hovered card's key visual (prepended so .works-inner paints above it)
+  const hoverBg = el("div", "works-hover-bg");
+  ring.closest(".works")?.prepend(hoverBg);
+  function showBg(c) {
+    // a thumb alone stays on the card
+    const src = c && (c._p.split.length ? c._p.split : c._p.images[0]);
+    // rebuilt only when the project changes (mouseover repeats while moving over one card, which would restart a video);
+    // kept on hover-out so it can fade
+    if (src && hoverBg._p !== c._p) { hoverBg.replaceChildren(pictures(src, c._p, false)); hoverBg._p = c._p; }
+    const v = hoverBg.querySelector("video");
+    if (v) src ? v.play().catch(() => {}) : v.pause();
+    hoverBg.classList.toggle("is-on", !!src);
+    ring.classList.toggle("is-bg", !!src);
+    document.getElementById("works").classList.toggle("is-bg", !!src);
+  }
+  ring.addEventListener("mouseover", e => {
+    hoverCard = e.target.closest(".pcard");
+    hovering = !!hoverCard;
+    showCaption(hoverCard || topCard);
+    showBg(hoverCard);
+  });
+  ring.addEventListener("mouseleave", () => { hovering = false; hoverCard = null; showCaption(topCard); showBg(null); });
+
+  /* open: the wheel fades, the project's images fan out */
+  wheel.addEventListener("click", e => {
+    const c = e.target.closest(".pcard");
+    if (!c) return;
+    e.preventDefault();
+    if (!moved) open(c._p);
+  });
+
+  function open(p) {
+    const imgs = p.split.length ? [p.split] : p.images.length ? p.images.slice(0, 5) : [null];
+    layers.textContent = "";
+    layerEls = imgs.map((src, i) => {
+      const l = el("div", "pstack-layer");
+      l.style.setProperty("--i", i);
+      l.append(pictures(src, p));
+      layers.append(l);
+      return l;
+    });
+    const off = parseFloat(getComputedStyle(ring).getPropertyValue("--off"));
+    layers.style.left = `calc(50% - ${(imgs.length - 1) * off / 2}px)`; // centre the whole fan
+
+    info.textContent = "";
+    const actions = el("div", "pstack-actions");
+    if (imgs.length > 1) {
+      const prev = el("button", "", "‹"), next = el("button", "", "›");
+      prev.type = next.type = "button";
+      prev.setAttribute("aria-label", "previous image"); next.setAttribute("aria-label", "next image");
+      prev.addEventListener("click", () => go(front - 1));
+      next.addEventListener("click", () => go(front + 1));
+      count = el("span", "pstack-count");
+      actions.append(prev, count, next);
+    }
+    const link = el("a", "", "View project ↗"); link.href = p.href;
+    const back = el("button", "", "← Back"); back.type = "button";
+    back.addEventListener("click", close);
+    actions.append(link, back);
+    info.append(el("h3", "", p.title), el("p", "", p.overview), actions);
+    go(0);
+
+    void layers.offsetWidth; // start from the folded state so the fan animates
+    isOpen = true;
+    ring.classList.add("is-open", "is-opening");
+    clearTimeout(openTimer);
+    openTimer = setTimeout(() => ring.classList.remove("is-opening"), 300 + imgs.length * 70 + 1000);
+    back.focus({ preventScroll: true });
+  }
+
+  /* flip through the opened stack: wraps from the last card back to the first */
+  let layerEls = [], front = 0, count = null, openTimer;
+  const pad2 = n => String(n).padStart(2, "0");
+  function go(n) {
+    const len = layerEls.length;
+    front = (n + len) % len;
+    place(front);
+    if (count) count.textContent = `${pad2(front + 1)} / ${pad2(len)}`;
+  }
+
+  function place(pos) {
+    layerEls.forEach((l, i) => { l.style.setProperty("--k", (i - pos).toFixed(3)); l.classList.toggle("is-past", i < pos - 0.5); });
+  }
+
+  function close() {
+    if (!isOpen) return;
+    isOpen = false;
+    count = null;
+    ring.classList.remove("is-open", "is-opening");
+    layers.querySelectorAll("video").forEach(v => v.pause()); // the stack stays in the DOM, faded out
+    topCard?.focus({ preventScroll: true });
+  }
+
+  // click the front card for the next one, a card behind to jump to it; empty space closes
+  let swiped = false, wheelAcc = 0;
+  stack.addEventListener("click", e => {
+    if (swiped) return;
+    const l = e.target.closest(".pstack-layer");
+    if (l) { const i = layerEls.indexOf(l); go(i === front ? front + 1 : i); }
+    else if (e.target === stack || e.target === layers) close();
+  });
+  // drag the stack: cards follow the pointer, then settle on the nearest one
+  // (a short pull of ~15% of a card is enough to flip, so quick flicks work too)
+  let drag = null;
+  const clamp = (v, lo, hi) => Math.min(hi, Math.max(lo, v));
+  layers.addEventListener("pointerdown", e => {
+    if (!isOpen || e.button !== 0) return;
+    swiped = false;
+    drag = { x: e.clientX, pos: front, moved: false, step: layerEls[0].offsetWidth * 0.45 }; // measured: --lw is a calc(), not a plain px value
+  });
+  addEventListener("pointermove", e => {
+    if (!drag) return;
+    const dx = e.clientX - drag.x;
+    if (!drag.moved && Math.abs(dx) < 6) return;
+    drag.moved = true;
+    stack.classList.add("is-dragging");
+    drag.pos = clamp(front - dx / drag.step, -0.4, layerEls.length - 0.6); // a little give past either end
+    place(drag.pos);
+  });
+  addEventListener("pointerup", () => {
+    if (!drag) return;
+    if (drag.moved) {
+      swiped = true; // swallow the click that follows the drag
+      stack.classList.remove("is-dragging");
+      const d = drag.pos - front;
+      go(clamp(front + Math.round(d + Math.sign(d) * 0.35), 0, layerEls.length - 1));
+    }
+    drag = null;
+  });
+  stack.addEventListener("dragstart", e => e.preventDefault()); // no native image drag
+  stack.addEventListener("wheel", e => {
+    if (!isOpen || Math.abs(e.deltaX) <= Math.abs(e.deltaY)) return; // vertical wheel still scrolls the page
+    e.preventDefault();
+    wheelAcc += e.deltaX;
+    if (Math.abs(wheelAcc) > 80) { go(front + Math.sign(wheelAcc)); wheelAcc = 0; }
+  }, { passive: false });
+  document.addEventListener("keydown", e => {
+    if (e.key === "Escape") close();
+    if (!isOpen) return;
+    if (e.key === "ArrowRight") go(front + 1);
+    if (e.key === "ArrowLeft") go(front - 1);
+  });
+
+  // slow idle spin, paused while a card is hovered, dragged, opened or off screen
+  (function tick() {
+    if (visible && !isOpen && !hovering && !dragging && !reduce) { rot -= 0.04; render(); }
+    requestAnimationFrame(tick);
+  })();
+
+  addEventListener("resize", layout);
+  layout();
+  build();
+})();
+
+/* ============================================================
+   9. Readout — design-tool style section / Y / progress chip,
+      shown once the cover has scrolled away
+   ============================================================ */
+(() => {
+  const box = document.querySelector(".readout");
+  const sec = document.getElementById("readoutSec");
+  const y = document.getElementById("readoutY");
+  const bar = document.getElementById("readoutBar");
+  const pct = document.getElementById("readoutPct");
+  const marks = [["works", "Projects"], ["about", "About"], ["contact", "Contact"]]
+    .map(([id, name]) => [document.getElementById(id), name]);
+
+  function update() {
+    const max = document.documentElement.scrollHeight - innerHeight;
+    const p = max > 0 ? Math.min(scrollY / max, 1) : 0;
+    let name = "Cover";
+    for (const [el, n] of marks) if (el.getBoundingClientRect().top <= innerHeight / 2) name = n;
+    box.classList.toggle("is-on", scrollY > innerHeight * 0.6);
+    sec.textContent = name;
+    y.textContent = "Y " + Math.round(scrollY).toLocaleString("en-US");
+    bar.style.setProperty("--p", p);
+    pct.textContent = Math.round(p * 100) + "%";
+  }
+  addEventListener("scroll", update, { passive: true });
+  addEventListener("resize", update);
+  update();
+})();
+</script>
+
+</body>
+</html>

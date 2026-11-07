@@ -1,0 +1,565 @@
+/* ========================================================
+   ENTROPY — Work Detail Pages
+   Shared stylesheet. Mirrors entropy.html's design-tool
+   aesthetic: bounding boxes, mono meta labels, red markers.
+   ======================================================== */
+
+:root {
+  --bg: #d8d9e6;
+  --bg-deep: #c6c8db;
+  --ink: #0b1240;
+  --ink-soft: rgba(11, 18, 64, 0.55);
+  --ink-faint: rgba(11, 18, 64, 0.32);
+  --blue: #1f3df0;
+  --red: #ff1a1a;
+  --line: rgba(11, 18, 64, 0.16);
+  --line-soft: rgba(11, 18, 64, 0.08);
+
+  --display: 'Afacad Flux', 'Archivo', sans-serif;
+  --sans: 'Space Grotesk', sans-serif;
+  --mono: 'JetBrains Mono', ui-monospace, monospace;
+
+  --pad: clamp(20px, 3vw, 40px);
+}
+
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+html { scroll-behavior: smooth; }
+body {
+  background: var(--bg);
+  color: var(--ink);
+  font-family: var(--sans);
+  font-size: 15px;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+}
+a { color: inherit; text-decoration: none; }
+::selection { background: var(--blue); color: white; }
+
+/* ─── Top bar ─── */
+.wtop {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  gap: 12px;
+  padding: var(--pad);
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ink-soft);
+  border-bottom: 1px solid var(--line);
+}
+.wtop-back {
+  color: var(--ink);
+  font-weight: 500;
+  transition: color 0.2s;
+}
+.wtop-back:hover { color: var(--blue); }
+.wtop-meta { text-align: center; }
+.wtop-name { text-align: right; color: var(--blue); font-weight: 700; }
+
+/* ─── Hero ─── */
+.whero {
+  position: relative;
+  padding: 64px var(--pad) 48px;
+  max-width: 1100px;
+}
+.wtag-row {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-bottom: 22px;
+}
+.wtag {
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--ink-soft);
+  border: 1px solid var(--line);
+  padding: 6px 12px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+.wtag::before { content: '○'; font-size: 9px; color: var(--red); }
+.wnum {
+  font-family: var(--mono);
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--blue);
+  margin-bottom: 10px;
+  letter-spacing: 0.04em;
+}
+.whero h1 {
+  font-family: var(--display);
+  font-weight: 900;
+  font-size: clamp(38px, 6vw, 80px);
+  line-height: 0.98;
+  letter-spacing: -0.03em;
+  margin-bottom: 14px;
+}
+.whero h1 small {
+  display: block;
+  font-family: var(--sans);
+  font-weight: 500;
+  font-size: clamp(15px, 1.6vw, 20px);
+  color: var(--ink-soft);
+  letter-spacing: 0;
+  margin-top: 8px;
+}
+.wsub {
+  font-family: var(--mono);
+  font-size: 12px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--red);
+}
+
+/* ─── Full-bleed cover: key visual fills the screen, text sits on its light left edge
+   (matches the portfolio PDF cover). Image set per page via --cover. ─── */
+.whero.whero-cover {
+  max-width: none;
+  aspect-ratio: 16 / 9;
+  display: flex;
+  align-items: center;
+  padding: 48px max(var(--pad), 4vw);
+  /* fade layer softens the image's left edge (image starts at ~26% of a 16:9 box) */
+  background:
+    linear-gradient(90deg, var(--bg) 27%, rgba(216, 217, 230, 0.6) 29.5%, transparent 33%),
+    var(--cover) right center / auto 100% no-repeat,
+    var(--bg);
+}
+.whero-text { width: 23vw; min-width: 300px; }
+.whero-cover .whero-block p { font-size: 14px; }
+.whero-cover h1 { font-size: clamp(34px, 3.4vw, 60px); }
+.whero-block { margin-top: 44px; }
+.whero-block h2 {
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--ink-soft);
+  margin-bottom: 14px;
+}
+.whero-block h2::before { content: '— '; color: var(--red); }
+.whero-block p { font-size: 15px; line-height: 1.7; }
+.whero-block p + p { margin-top: 12px; }
+.whero-block p em { font-style: normal; color: var(--blue); font-weight: 700; }
+.wmeta.whero-info {
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+  margin: 36px 0 0;
+  padding: 24px 0 0;
+  background: none;
+  border-bottom: none;
+}
+.whero-info dd { font-size: 14px; }
+
+/* ─── Meta grid (period / role / tools) ─── */
+.wmeta {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 24px;
+  padding: 28px var(--pad);
+  margin: 0 0 8px;
+  border-top: 1px solid var(--line);
+  border-bottom: 1px solid var(--line);
+  background: var(--bg-deep);
+}
+.wmeta dt {
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--ink-soft);
+  margin-bottom: 8px;
+}
+.wmeta dt::before { content: '— '; color: var(--red); }
+.wmeta dd {
+  font-family: var(--sans);
+  font-size: 15px;
+  font-weight: 500;
+  line-height: 1.6;
+}
+
+/* ─── Sections ─── */
+.wsection {
+  padding: 56px var(--pad);
+  max-width: 900px;
+}
+.wsection + .wsection { border-top: 1px solid var(--line); }
+.wsection h2 {
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--ink-soft);
+  margin-bottom: 20px;
+}
+.wsection h2::before { content: '— '; color: var(--red); }
+.wsection p {
+  font-size: clamp(16px, 1.6vw, 20px);
+  line-height: 1.6;
+  font-weight: 500;
+  letter-spacing: -0.01em;
+  max-width: 760px;
+}
+.wsection p + p { margin-top: 16px; }
+.wsection p em {
+  font-style: normal;
+  color: var(--blue);
+  font-weight: 700;
+}
+
+.wlist {
+  display: grid;
+  gap: 14px;
+  margin-top: 8px;
+}
+.wlist li {
+  list-style: none;
+  padding: 16px 20px;
+  border: 1px solid var(--line);
+  font-size: 14px;
+  line-height: 1.6;
+}
+.wlist li b {
+  display: block;
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--blue);
+  margin-bottom: 6px;
+}
+
+/* ─── Cards (mirrors entropy.html's Expertise grid) ─── */
+.wcards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  margin-top: 40px;
+  border: 1px solid var(--line);
+}
+.wcards li {
+  list-style: none;
+  padding: 52px 24px;
+  min-height: 460px;
+  display: flex;
+  flex-direction: column;
+  border-right: 1px solid var(--line);
+  position: relative;
+  transition: background 0.3s ease;
+}
+.wcards li:last-child { border-right: none; }
+.wcards li:hover { background: rgba(31, 61, 240, 0.045); }
+.wcards li::after {
+  content: '';
+  position: absolute;
+  left: 0; right: 0; bottom: 0;
+  height: 3px;
+  background: var(--red);
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 0.5s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.wcards li:hover::after { transform: scaleX(1); }
+.wcard-index {
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--ink-soft);
+  margin-bottom: 14px;
+}
+.wcard-title {
+  font-family: var(--display);
+  font-weight: 700;
+  font-size: 30px;
+  letter-spacing: -0.01em;
+  margin-bottom: 12px;
+  transition: color 0.3s;
+}
+.wcards li:hover .wcard-title { color: var(--blue); }
+.wsection .wcard-desc {
+  font-size: 13px;
+  line-height: 1.65;
+  font-weight: 400;
+  color: var(--ink-soft);
+  margin-bottom: 20px;
+}
+.wcard-tag {
+  margin-top: auto;
+  align-self: flex-start;
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 0.04em;
+  color: var(--ink-soft);
+  border: 1px solid var(--line);
+  padding: 4px 8px;
+  transition: border-color 0.3s, color 0.3s;
+}
+.wcards li:hover .wcard-tag { border-color: rgba(31, 61, 240, 0.3); color: var(--ink); }
+
+/* ─── Palette ─── */
+.wswatches {
+  display: flex;
+  gap: 20px;
+  flex-wrap: wrap;
+  margin-top: 8px;
+}
+.wswatch { text-align: center; }
+.wswatch i {
+  display: block;
+  width: 48px;
+  height: 48px;
+  border: 1px solid var(--line);
+  margin-bottom: 8px;
+}
+.wswatch span {
+  font-family: var(--mono);
+  font-size: 10px;
+  color: var(--ink-soft);
+  text-transform: uppercase;
+}
+
+/* ─── Footer nav ─── */
+.wnav {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  border-top: 1px solid var(--line);
+}
+.wnav a {
+  padding: 32px var(--pad);
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--ink-soft);
+  transition: color 0.2s, background 0.2s;
+}
+.wnav a:hover { color: var(--ink); background: var(--bg-deep); }
+.wnav-next { text-align: right; border-left: 1px solid var(--line); }
+.wnav a span.title {
+  display: block;
+  margin-top: 8px;
+  font-family: var(--display);
+  font-weight: 700;
+  font-size: 18px;
+  letter-spacing: -0.01em;
+  color: var(--ink);
+  text-transform: none;
+}
+
+.wfoot {
+  display: flex;
+  justify-content: space-between;
+  padding: 24px var(--pad) 40px;
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--ink-soft);
+}
+
+/* ─── Page width cap (matches entropy.html's 1240px centered column) ─── */
+.whero, .wsection {
+  max-width: 1240px;
+  margin-inline: auto;
+}
+/* full-bleed bars: background/border stay edge-to-edge, content aligns to the column */
+.wtop, .wmeta, .wfoot {
+  padding-inline: max(var(--pad), calc((100% - 1240px) / 2 + var(--pad)));
+}
+.wnav { padding-inline: max(0px, calc((100% - 1240px) / 2)); } /* links carry their own --pad */
+
+@media (max-width: 720px) {
+  .wmeta { grid-template-columns: 1fr 1fr; }
+  .wnav { grid-template-columns: 1fr; }
+  .whero.whero-cover { aspect-ratio: auto; flex-direction: column; align-items: stretch; padding-bottom: 0; background: var(--bg); }
+  .whero-cover::after { content: ""; display: block; aspect-ratio: 2220 / 1686; margin: 32px calc(-1 * max(var(--pad), 4vw)) 0; background: var(--cover) center / cover; }
+  .whero-text { width: auto; }
+
+  .wcards li { min-height: 0; border-right: none; border-bottom: 1px solid var(--line); }
+  .wcards li:last-child { border-bottom: none; }
+  .wnav-next { border-left: none; border-top: 1px solid var(--line); text-align: left; }
+}
+
+/* ─── Full-screen key visual: fills the first screen edge to edge, top bar comes after it ─── */
+.wkv { display: block; width: 100%; height: 100vh; height: 100svh; object-fit: cover; position: sticky; top: 0;
+  /* blurs and fades back as the page scrolls over it (--p set by script); slight scale hides the blurred edges */
+  filter: blur(calc(var(--p, 0) * 12px)) brightness(calc(1 - var(--p, 0) * 0.3)) saturate(calc(1 - var(--p, 0) * 0.4));
+  transform: scale(calc(1 + var(--p, 0) * 0.08));
+}
+/* full-width cover: sides never crop; on screens wider than the image (--ar, default 16:9) it runs past the screen and only its bottom is cut */
+.wkv.wkv-fit { height: min(100svh, calc(100vw / var(--ar, 1.7778))); object-position: top; }
+/* inset cover: full screen height, width from the image's ratio (--ar), centred with the page background either side */
+.wkv.wkv-inset { height: 100svh; width: min(100%, calc(100svh * var(--ar, 1.7778))); margin: 0 auto; }
+/* split cover on a white sheet: 1st top right, 2nd bottom left on the bottom edge (same layout as the index's .psplit) */
+.wkv.wkv-split { position: sticky; background: white; overflow: hidden; }
+.wkv-split > * { position: absolute; }
+.wkv-split > :nth-child(1) { top: 9%; right: 3%; width: 50%; height: auto; }
+/* clip trims the Naver file's stray dark top row and the black bezel strip along its bottom (~2%); bottom < 0 hides the gap that leaves */
+.wkv-split > :nth-child(2) { bottom: -1.5%; left: 4%; height: 72%; width: auto; clip-path: inset(1% 0 2.2%); }
+@media (max-aspect-ratio: 1/1) { .wkv.wkv-split { height: auto; aspect-ratio: 16 / 9; } } /* children are absolute, so it needs a height of its own */
+@media (prefers-reduced-motion: reduce) { .wkv { transform: none; } }
+body:has(.wkv) { overflow-x: clip; } /* keeps the scaled cover from adding a sideways scroll; clip (not hidden) so sticky still works */
+/* the rest of the page slides up over the pinned cover, so it needs a solid background on top */
+.wkv ~ :is(main, footer, .wfoot) { position: relative; z-index: 1; background: var(--bg); }
+.wkv ~ main { box-shadow: 0 0 0 100vmax var(--bg); clip-path: inset(0 -100vmax); } /* stretch the column's background to both screen edges, not above or below it */
+@media (max-width: 1479px) { .wkv ~ .wtoc { position: relative; z-index: 1; } } /* toc is a static row here; fixed badge above */
+@media (max-aspect-ratio: 1/1) { .wkv { height: auto; } }
+/* top bar pinned to the top of the screen, faded out while the cover is in view */
+.wtop.wtop-fixed {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 3;
+  display: flex; justify-content: space-between; /* just the two ends, no middle label */
+  padding: 12px var(--pad); /* text out at the screen edges, not the content column */
+  font-family: var(--display);
+  font-size: 14px; /* Afacad runs smaller than the mono, so matched to the toc */
+  border-bottom: none;
+  transition: opacity 0.5s ease;
+}
+.wtop.wtop-fixed.is-hidden { opacity: 0; pointer-events: none; }
+html:has(.wtop-fixed) { scroll-padding-top: 46px; } /* toc jumps land below the bar */
+@media (prefers-reduced-motion: reduce) { .wtop.wtop-fixed { transition: none; } } /* portrait: cropping to fill would cut off the logo, so show it whole */
+
+/* ─── Slide deck: stacked images exported from Figma, in the 1240px page column ─── */
+.wslides {
+  max-width: 1240px;
+  margin: 0 auto;
+  padding: 48px var(--pad);
+}
+/* toc target inside a slide: sits --up (% of slide width) above the next slide, so the jump lands on the section title */
+.wslide > .wmark { position: absolute; left: 0; } /* toc target partway down a slide; top set inline as % of the slide */
+.wanchor { display: block; padding-top: 1px; margin: calc(-1 * var(--up) - 1px) 0 var(--up); } /* padding stops the two margins collapsing into each other */
+.wslides img {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+.wvideo {
+  aspect-ratio: 16 / 9;
+  background: #000;
+}
+.wvideo iframe {
+  display: block;
+  width: 100%;
+  height: 100%;
+  border: 0;
+}
+
+/* ─── Table of contents: row above the slides; floating badge centered in the right margin on wide screens ─── */
+.wtoc {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 4px 28px;
+  padding: 16px var(--pad);
+  background: var(--bg);
+  border-bottom: 1px solid var(--line);
+  font-family: var(--display);
+  font-size: 14px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+.wtoc a { position: relative; color: var(--ink-soft); }
+.wtoc a:hover { color: var(--blue); }
+.wtoc a.is-active { color: var(--blue); }
+/* dot sits outside the label so switching sections never shifts the other links */
+.wtoc a.is-active::before { content: '●'; position: absolute; right: 100%; margin-right: 6px; color: var(--red); font-size: 8px; line-height: 1; top: 50%; transform: translateY(-50%);
+  animation: wtoc-dot-in 0.35s cubic-bezier(0.34, 1.56, 0.64, 1); }
+/* pops in when a section becomes active */
+@keyframes wtoc-dot-in { from { transform: translateY(-50%) scale(0); } }
+@media (prefers-reduced-motion: reduce) { .wtoc a.is-active::before { animation: none; } }
+@media (min-width: 1480px) {
+  .wtoc {
+    position: fixed; z-index: 2;
+    top: 50%;
+    /* center of the right margin: margin width = (100vw - 1240px) / 2 + pad */
+    right: calc((100vw - 1240px) / 4 + var(--pad) / 2);
+    transform: translate(50%, -50%);
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 20px 22px;
+    background: rgba(216, 217, 230, 0.85);
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    backdrop-filter: blur(8px);
+    transition: opacity 0.4s ease;
+  }
+  .wtoc.is-hidden { opacity: 0; pointer-events: none; } /* while the full-screen key visual is in view */
+}
+
+/* ─── Layered slide: background + cut-out objects rebuilt from the Illustrator file ─── */
+.wslide { position: relative; container-type: inline-size; } /* no overflow clip: objects may cross into the neighbouring slide */
+.wslide > img:first-of-type, .wvideo { margin-bottom: -1px; } /* overlap by 1px so fractional slide heights never leave a light hairline */
+.wslides .wfg { position: absolute; top: 0; left: 0; z-index: 1; /* above the next slide, which pieces run into */ transition: opacity 0.9s ease, translate 0.9s ease; }
+.wslides .wlayer {
+  position: absolute;
+  z-index: 1;
+  transform:
+    translate(calc(var(--mx, 0) * var(--depth) * 18px), calc(var(--my, 0) * var(--depth) * 12px))
+    rotate(calc(var(--mx, 0) * var(--depth) * 4deg));
+  transition: transform 0.6s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.9s ease var(--d, 0s), translate 1.2s cubic-bezier(0.22, 1, 0.36, 1) var(--d, 0s);
+  pointer-events: none;
+}
+@media (prefers-reduced-motion: reduce) { .wslides .wlayer { transform: none; } }
+
+/* ─── Reveal on scroll (as on entropy.html): background stays put, the slide content fades up, then the loose objects one by one ─── */
+/* uses the separate translate property so it stacks with the cursor transform above */
+.wslide.reveal .wfg { opacity: 0; translate: 0 24px; }
+.wslide.reveal .wlayer { opacity: 0; translate: 0 60px; }
+.wslide.reveal.in :is(.wfg, .wlayer) { opacity: 1; translate: none; }
+.wlayer:nth-child(3) { --d: 0.3s; }
+.wlayer:nth-child(4) { --d: 0.45s; }
+.wlayer:nth-child(5) { --d: 0.6s; }
+.wlayer:nth-child(6) { --d: 0.75s; }
+@media (prefers-reduced-motion: reduce) { .wslide.reveal :is(.wfg, .wlayer) { opacity: 1; translate: none; transition: none; } }
+
+
+/* ─── Custom cursor, same as entropy.html: crosshair + trailing red dot ─── */
+@media (pointer: fine) { body, a { cursor: crosshair; } }
+.cursor {
+  position: fixed; top: 0; left: 0; width: 18px; height: 18px;
+  pointer-events: none; z-index: 10000;
+  transform: translate(-50%, -50%);
+  mix-blend-mode: difference;
+  transition: opacity 0.2s ease;
+}
+.cursor::before, .cursor::after { content: ''; position: absolute; background: white; }
+.cursor::before { top: 50%; left: 0; right: 0; height: 1px; transform: translateY(-50%); }
+.cursor::after  { left: 50%; top: 0; bottom: 0; width: 1px;  transform: translateX(-50%); }
+.cursor-dot {
+  position: fixed; top: 0; left: 0; width: 24px; height: 24px;
+  background: rgba(255, 26, 26, 0.42);
+  pointer-events: none; z-index: 10001;
+  transform: translate(-50%, -50%);
+  border-radius: 50%;
+  transition: opacity 0.2s;
+}
+.cursor.is-out, .cursor-dot.is-out { opacity: 0; } /* pointer left the page or is over the video */
+@media (pointer: coarse) { .cursor, .cursor-dot { display: none; } }
+
+/* live text on slides, sized in 1920-wide artboard units so it scales with the slide */
+.wslides .wtext { margin: 0; font: 300 calc(25 / 1920 * 100cqw) / calc(32 / 1920 * 100cqw) "Afacad Flux", sans-serif; color: #fff; white-space: nowrap; }
+.wslides .wtext-title { font-size: calc(34 / 1920 * 100cqw); font-weight: 700; }
+/* NanumSquare OTF, Latin-only subset of the installed font (matches the catalog's body type) */
+@font-face { font-family: "NanumSquare"; src: url("fonts/NanumSquareL-latin.woff2") format("woff2"); font-weight: 300; font-display: swap; }
+@font-face { font-family: "NanumSquare"; src: url("fonts/NanumSquareR-latin.woff2") format("woff2"); font-weight: 400; font-display: swap; }
+@font-face { font-family: "NanumSquare"; src: url("fonts/NanumSquareB-latin.woff2") format("woff2"); font-weight: 700; font-display: swap; }
+.wslides .wtext-wrap { white-space: normal; text-wrap: balance; font-family: "NanumSquare", sans-serif; font-weight: 400; } /* paragraph copy that wraps inside its inline width */
+.wslides .wtext b { font-weight: 700; }
+/* spec list: each bold title on its own line, a gap above it (between groups) and a small one below (before its values) */
+.wslides .wspec b { display: block; margin: calc(24 / 1920 * 100cqw) 0 calc(8 / 1920 * 100cqw); }
+.wslides .wspec b:first-child { margin-top: 0; font-size: calc(30 / 1920 * 100cqw); } /* venue name: larger than the group titles */
+/* numbered circle in a legend, like the ① marks on the map */
+.wslides .wnum {
+  display: inline-grid; place-items: center; vertical-align: middle;
+  width: calc(28 / 1920 * 100cqw); height: calc(28 / 1920 * 100cqw); margin: -0.2em calc(10 / 1920 * 100cqw) 0 0;
+  border-radius: 50%; background: #fff; color: #111;
+  font: normal 700 calc(26 / 1920 * 100cqw) / 1 "Afacad Flux", sans-serif;
+}
+.wslides .wnum-pin { margin: 0; transform: translate(-50%, -50%); } /* on the map: left/top give the circle's centre */
+.wslides .wtab { display: inline-block; width: calc(230 / 1920 * 100cqw); } /* label column in a spec list */
