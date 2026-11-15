@@ -13,55 +13,55 @@
 <div class="cursor is-out"></div>
 <div class="cursor-dot is-out"></div>
 
-<!-- cover: artboard 19 of 모그워2 기말과제 발표자료.ai; top bar sits below it -->
-<img class="wkv wkv-fit" src="images/04/keyvisual.jpg" width="1920" height="1080" style="object-position: 50% 50%" alt="AC/DC — Back in Black"> <!-- crop top and bottom evenly so the logo stays mid-screen -->
+<!-- scroll stops on the cover: start, and the finished artboard 20 mid-hold (see .wsnap) -->
+<i class="wsnap" style="top: 0"></i>
+<i class="wsnap" style="top: calc(130svh + 46px)"></i>
+<!-- cover: artboard 20 of 박다영 포트폴리오.ai exported as layers (2x); works.css .wkv-layers moves them into place on scroll -->
+<div class="wkv wkv-layers wkv-full"> <!-- wkv-full: no side margins closing in -->
+  <div class="wkv-stage">
+    <img src="images/04/s20/bg.jpg" width="3840" height="2160" alt="Back in Black">
+    <img class="wkv-shade" src="images/04/s20/shade.png" width="3840" height="2160" alt="">
+    <img class="wkv-panel" src="images/04/s20/panel-en.png" width="3840" height="2160" alt="">
+    <img class="wkv-top" src="images/04/s20/top.png" width="3840" height="2160" alt="">
+    <img class="wkv-logo" src="images/04/s20/logo.png" width="3840" height="2160" style="--lx: -10.755%" alt="AC/DC — Back in Black logo"> <!-- 10.755% = artboard centre → logo centre -->
+  </div>
+  <i class="wkv-curtain l"></i><i class="wkv-curtain r"></i> <!-- side margins close in (works.css) -->
+</div>
 
 <header class="wtop wtop-fixed is-hidden">
   <a class="wtop-back" href="../index.html#works">← Index</a>
   <div class="wtop-name">Park Dayoung</div>
 </header>
 
-<main> <!-- slides over the pinned cover (see .wkv ~ main) -->
-<section class="whero">
-  <div class="wnum">04 / 11</div>
-  <div class="wtag-row">
-    <span class="wtag">영상</span>
-    <span class="wtag">2024</span>
-    <span class="wtag">개인 프로젝트</span>
+<main class="wslides wslides-wide"> <!-- slides over the pinned cover (see .wkv ~ main); artboards 21–22 of 박다영 포트폴리오.ai, 2x renders -->
+  <!-- background (with the section label) stays put; the objects, captured separately from the artboard, rise in one by one on scroll (.wslide.reveal, --d = delay) -->
+  <div class="wslide">
+    <img src="images/04/s21/bg.jpg" width="3840" height="2160" loading="eager" alt="Back in Black — design summary">
+    <img class="wlayer" decoding="async" src="images/04/s21/background.png" style="left: 4.531%; top: 16.759%; width: 40.833%; --d: 0s" alt="Background: a music video reinterpreting AC/DC's Back in Black">
+    <img class="wlayer" decoding="async" src="images/04/s21/palette.png" style="left: 4.531%; top: 40.833%; width: 39.844%; --d: 0.15s" alt="Colour palette: BB0001, D94130, E3893A, F1B22C, FEDD9B, 101216">
+    <img class="wlayer" decoding="async" src="images/04/s21/font.png" style="left: 4.531%; top: 67.87%; width: 39.844%; --d: 0.3s" alt="Fonts: Modern No. 20, Dutch801 Rm BT, Lucida Bright, Impact">
+    <img class="wlayer" decoding="async" src="images/04/s21/visual.png" style="left: 46.615%; top: 16.759%; width: 48.906%; --d: 0.1s" alt="">
+    <img class="wlayer" decoding="async" src="images/04/s21/mic.png" style="left: 80.208%; top: 21.852%; width: 19.01%; --d: 0.6s" alt="Microphone">
+    <img class="wlayer" decoding="async" src="images/04/s21/guitar.png" style="left: 47.24%; top: 20.37%; width: 22.344%; --d: 0.3s" alt="Guitar">
+    <img class="wlayer" decoding="async" src="images/04/s21/drums.png" style="left: 67.396%; top: 24.259%; width: 18.594%; --d: 0.45s" alt="Drums">
+    <img class="wlayer" decoding="async" src="images/04/s21/cards.png" style="left: 48.177%; top: 64.167%; width: 51.51%; --d: 0.75s" alt="Cards">
   </div>
-  <h1>Back in Black<small>AC/DC — 뮤직비디오</small></h1>
-  <p class="wsub">Music Video</p>
-</section>
-
-<dl class="wmeta">
-  <div><dt>Period</dt><dd>2024. 11 – 2024. 12</dd></div>
-  <div><dt>Role</dt><dd>그래픽 · 모션</dd></div>
-  <div><dt>Tools</dt><dd>Illustrator · After Effects</dd></div>
-  <div><dt>Type</dt><dd>개인 프로젝트</dd></div>
-</dl>
-
-<section class="wsection">
-  <h2>Overview</h2>
-  <p><em>Back in Black</em>의 강렬한 에너지에 비해 적절한 뮤직 비디오가 부족하다고 느껴, 곡의 태도와 파워를 시각적으로 재해석한 뮤직 비디오를 제작하였습니다.</p>
-  <p>레드 계열 컬러와 그래픽 중심의 연출을 통해 음악의 리듬과 강렬함을 직관적으로 표현하고자 하였으며, 가사의 메시지가 직접적으로 드러나는 그래픽 표현에 집중하여 음악과 영상의 몰입도를 높이고자 하였습니다.</p>
-</section>
-
-<section class="wsection">
-  <h2>Palette</h2>
-  <div class="wswatches">
-    <div class="wswatch"><i style="background:#BB0001"></i><span>BB0001</span></div>
-    <div class="wswatch"><i style="background:#D94130"></i><span>D94130</span></div>
-    <div class="wswatch"><i style="background:#E3893A"></i><span>E3893A</span></div>
-    <div class="wswatch"><i style="background:#F1B22C"></i><span>F1B22C</span></div>
-    <div class="wswatch"><i style="background:#FEDD9B"></i><span>FEDD9B</span></div>
-    <div class="wswatch"><i style="background:#101216"></i><span>101216</span></div>
+  <div class="wslide">
+    <img src="images/04/s22/bg.jpg" width="3840" height="2160" loading="lazy" alt="Back in Black — style frames">
+    <img class="wlayer" decoding="async" src="images/04/s22/c1.jpg" style="left: 3.125%; top: 14.815%; width: 23.281%; --d: 0s" loading="lazy" alt="">
+    <img class="wlayer" decoding="async" src="images/04/s22/c2.jpg" style="left: 26.615%; top: 14.815%; width: 23.333%; --d: 0.08s" loading="lazy" alt="">
+    <img class="wlayer" decoding="async" src="images/04/s22/c3.jpg" style="left: 50.104%; top: 14.815%; width: 23.281%; --d: 0.16s" loading="lazy" alt="">
+    <img class="wlayer" decoding="async" src="images/04/s22/c4.jpg" style="left: 73.594%; top: 14.815%; width: 23.281%; --d: 0.24s" loading="lazy" alt="">
+    <img class="wlayer" decoding="async" src="images/04/s22/c5.jpg" style="left: 3.125%; top: 38.241%; width: 23.281%; --d: 0.32s" loading="lazy" alt="">
+    <img class="wlayer" decoding="async" src="images/04/s22/c6.jpg" style="left: 26.615%; top: 38.241%; width: 23.333%; --d: 0.4s" loading="lazy" alt="">
+    <img class="wlayer" decoding="async" src="images/04/s22/c7.jpg" style="left: 50.104%; top: 38.241%; width: 23.281%; --d: 0.48s" loading="lazy" alt="">
+    <img class="wlayer" decoding="async" src="images/04/s22/c8.jpg" style="left: 73.594%; top: 38.241%; width: 23.333%; --d: 0.56s" loading="lazy" alt="">
+    <img class="wlayer" decoding="async" src="images/04/s22/c9.jpg" style="left: 3.125%; top: 61.667%; width: 23.281%; --d: 0.64s" loading="lazy" alt="">
+    <img class="wlayer" decoding="async" src="images/04/s22/c10.jpg" style="left: 26.615%; top: 61.667%; width: 23.333%; --d: 0.72s" loading="lazy" alt="">
+    <img class="wlayer" decoding="async" src="images/04/s22/c11.jpg" style="left: 50.104%; top: 61.667%; width: 23.281%; --d: 0.8s" loading="lazy" alt="">
+    <img class="wlayer" decoding="async" src="images/04/s22/c12.jpg" style="left: 73.594%; top: 61.667%; width: 23.281%; --d: 0.88s" loading="lazy" alt="">
   </div>
-</section>
-
-<section class="wsection">
-  <h2>Type</h2>
-  <p style="font-size:15px; font-weight:400;">Title — <em>Modern No. 20</em> / <em>Dutch801 Rm BT</em> · Subtitle — <em>Lucida Bright</em> · Text — <em>Impact</em></p>
-</section>
+  <div class="wvideo" id="video"><iframe src="https://player.vimeo.com/video/1226362190?dnt=1" title="Back in Black music video" loading="lazy" allow="autoplay; fullscreen; picture-in-picture" allowfullscreen></iframe></div>
 </main>
 
 <footer class="wnav">

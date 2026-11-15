@@ -13,54 +13,52 @@
 <div class="cursor is-out"></div>
 <div class="cursor-dot is-out"></div>
 
-<!-- cover: artboard 22 of 20212144 박다영 중간과제.ai (1108 × 768, not 16:9); top bar sits below it -->
-<img class="wkv wkv-inset" src="images/03/keyvisual.jpg" width="1920" height="1331" style="--ar: 1.4427" alt="Renaissance Pleasure Faire">
+<!-- cover: artboard 17 of 박다영 포트폴리오.ai exported as layers (2x); works.css .wkv-layers moves them into place on scroll -->
+<!-- scroll stops on the cover: start, and the finished artboard 17 mid-hold (see .wsnap) -->
+<i class="wsnap" style="top: 0"></i>
+<i class="wsnap" style="top: calc(130svh + 46px)"></i>
+<div class="wkv wkv-layers wkv-full"> <!-- wkv-full: background stays full-bleed, objects draw in -->
+  <div class="wkv-stage">
+    <img src="images/03/s17/bg.jpg" width="3840" height="2160" alt="Renaissance Pleasure Fair">
+    <img class="wkv-shade" src="images/03/s17/shade.png" width="3840" height="2160" alt="">
+    <img class="wkv-panel" src="images/03/s17/panel-en.png" width="3840" height="2160" alt="">
+    <img class="wkv-top" src="images/03/s17/top.png" width="3840" height="2160" alt="">
+    <img class="wkv-logo" src="images/03/s17/logo.png" width="3840" height="2160" alt="Renaissance Pleasure Faire logo">
+  </div>
+  <i class="wkv-curtain l"></i><i class="wkv-curtain r"></i> <!-- side margins close in (works.css) -->
+</div>
 
 <header class="wtop wtop-fixed is-hidden">
   <a class="wtop-back" href="../index.html#works">← Index</a>
   <div class="wtop-name">Park Dayoung</div>
 </header>
 
-<main> <!-- slides over the pinned cover (see .wkv ~ main) -->
-<section class="whero">
-  <div class="wnum">03 / 11</div>
-  <div class="wtag-row">
-    <span class="wtag">영상</span>
-    <span class="wtag">2024</span>
-    <span class="wtag">개인 프로젝트</span>
+<main class="wslides wslides-wide"> <!-- slides over the pinned cover (see .wkv ~ main); artboards 18–19 of 박다영 포트폴리오.ai, 2x renders -->
+  <!-- background (with the section label) stays put; the objects, captured separately from the artboard, rise in one by one on scroll (.wslide.reveal, --d = delay) -->
+  <div class="wslide">
+    <img src="images/03/s18/bg.jpg" width="3840" height="2160" loading="eager" alt="Renaissance Pleasure Fair — design summary">
+    <img class="wlayer" decoding="async" src="images/03/s18/background.png" style="left: 4.531%; top: 16.759%; width: 40.833%; --d: 0s" alt="Background: a promotional video for the Renaissance Pleasure Faire">
+    <img class="wlayer" decoding="async" src="images/03/s18/title.png" style="left: 4.531%; top: 40.833%; width: 39.844%; --d: 0.15s" alt="Title logo">
+    <img class="wlayer" decoding="async" src="images/03/s18/font.png" style="left: 4.583%; top: 67.593%; width: 39.792%; --d: 0.3s" alt="Fonts: Monotype Corsiva, Georgia Italic">
+    <img class="wlayer" decoding="async" src="images/03/s18/visual.png" style="left: 46.615%; top: 16.759%; width: 48.906%; --d: 0.1s" alt="">
+    <img class="wlayer" decoding="async" src="images/03/s18/v1.png" style="left: 48.281%; top: 29.167%; width: 24.01%; --d: 0.3s" alt="Jousting">
+    <img class="wlayer" decoding="async" src="images/03/s18/v2.png" style="left: 72.135%; top: 29.167%; width: 23.594%; --d: 0.45s" alt="The Queen's Court">
+    <img class="wlayer" decoding="async" src="images/03/s18/v3.png" style="left: 47.5%; top: 62.778%; width: 24.74%; --d: 0.6s" alt="Merchants and Craftsmen">
+    <img class="wlayer" decoding="async" src="images/03/s18/v4.png" style="left: 72.552%; top: 63.056%; width: 23.177%; --d: 0.75s" alt="Gathering">
   </div>
-  <h1>Renaissance<small>Pleasure Fair</small></h1>
-  <p class="wsub">Promotion Video</p>
-</section>
-
-<dl class="wmeta">
-  <div><dt>Period</dt><dd>2024. 10 – 2024. 11</dd></div>
-  <div><dt>Role</dt><dd>기획 · 그래픽 · 모션</dd></div>
-  <div><dt>Tools</dt><dd>Illustrator · After Effects · Photoshop</dd></div>
-  <div><dt>Type</dt><dd>개인 프로젝트</dd></div>
-</dl>
-
-<section class="wsection">
-  <h2>Overview</h2>
-  <p>르네상스 페어는 과거 르네상스 시대를 재현한 대형 테마 축제로, 미국 여러 지역에서 해마다 개최되고 있는 오랜 역사의 행사입니다.</p>
-  <p>하지만 직접 참여했을 당시 오래된 디자인이 아쉽고 행사를 홍보하는 마땅한 시각 자료가 부족하다는 생각이 들어, <em>타로 카드</em>의 그래픽 요소를 르네상스 테마와 결합한 홍보 영상을 제작하게 되었습니다.</p>
-</section>
-
-<section class="wsection">
-  <h2>Design Concept</h2>
-  <p>타로 카드 속 이미지들을 통해 행사에 포함된 다양한 콘텐츠를 시각적으로 표현했습니다.</p>
-  <ul class="wlist">
-    <li><b># Jousting</b>Knight of Swords — 기사들의 마상 창시합.</li>
-    <li><b># The Queen's Court</b>Queen of Swords — 여왕이 함께하는 궁정 행렬.</li>
-    <li><b># Merchants and Craftsmen</b>The Magician · Pentacles — 장인과 상인들의 거리.</li>
-    <li><b># Gathering</b>Three of Cups — 축제의 군중과 어울림.</li>
-  </ul>
-</section>
-
-<section class="wsection">
-  <h2>Type</h2>
-  <p style="font-size:15px; font-weight:400;">타이틀 로고는 원본 축제 로고를 참고하고, 본문에는 <em>Monotype Corsiva</em>와 <em>Georgia Italic</em>을 함께 사용해 르네상스 시대의 필기체 인상을 살렸습니다.</p>
-</section>
+  <div class="wslide">
+    <img src="images/03/s19/bg.jpg" width="3840" height="2160" loading="lazy" alt="Renaissance Pleasure Fair — style frames">
+    <img class="wlayer" decoding="async" src="images/03/s19/c1.jpg" style="left: 5.885%; top: 9.722%; width: 29.323%; --d: 0s" loading="lazy" alt="">
+    <img class="wlayer" decoding="async" src="images/03/s19/c2.jpg" style="left: 35.365%; top: 9.722%; width: 29.323%; --d: 0.1s" loading="lazy" alt="">
+    <img class="wlayer" decoding="async" src="images/03/s19/c3.jpg" style="left: 64.844%; top: 9.722%; width: 29.271%; --d: 0.2s" loading="lazy" alt="">
+    <img class="wlayer" decoding="async" src="images/03/s19/c4.jpg" style="left: 5.885%; top: 39.167%; width: 29.323%; --d: 0.3s" loading="lazy" alt="">
+    <img class="wlayer" decoding="async" src="images/03/s19/c5.jpg" style="left: 35.365%; top: 39.167%; width: 29.323%; --d: 0.4s" loading="lazy" alt="">
+    <img class="wlayer" decoding="async" src="images/03/s19/c6.jpg" style="left: 64.844%; top: 39.167%; width: 29.271%; --d: 0.5s" loading="lazy" alt="">
+    <img class="wlayer" decoding="async" src="images/03/s19/c7.jpg" style="left: 5.885%; top: 68.611%; width: 29.323%; --d: 0.6s" loading="lazy" alt="">
+    <img class="wlayer" decoding="async" src="images/03/s19/c8.jpg" style="left: 35.365%; top: 68.611%; width: 29.323%; --d: 0.7s" loading="lazy" alt="">
+    <img class="wlayer" decoding="async" src="images/03/s19/c9.jpg" style="left: 64.844%; top: 68.611%; width: 29.271%; --d: 0.8s" loading="lazy" alt="">
+  </div>
+  <div class="wvideo" id="video"><iframe src="https://player.vimeo.com/video/1226361046?dnt=1" title="Renaissance Pleasure Fair promotion video" loading="lazy" allow="autoplay; fullscreen; picture-in-picture" allowfullscreen></iframe></div>
 </main>
 
 <footer class="wnav">

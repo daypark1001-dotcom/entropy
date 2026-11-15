@@ -392,6 +392,60 @@ a { color: inherit; text-decoration: none; }
   filter: blur(calc(var(--p, 0) * 12px)) brightness(calc(1 - var(--p, 0) * 0.3)) saturate(calc(1 - var(--p, 0) * 0.4));
   transform: scale(calc(1 + var(--p, 0) * 0.08));
 }
+/* layered cover (pages 03, 04): the artboard split into background / logo / side panel / top tags on one 16:9 stage that covers
+   the screen. Over the first stretch of scroll (--a/--b/--c, eased by works.js) the background stays put while the logo glides
+   from centre to its place on the right, the panel slides in from the left, the tags drop in, and page-coloured curtains close
+   in from both sides (full height, margins left and right); it holds, then the page slides up.
+   Everything moves by translate / transform / opacity only — no resizing — so it stays on the compositor and scrolls smoothly */
+.wkv.wkv-layers { overflow: hidden; background: var(--bg); --a: 0; --b: 0; --c: 0; }
+/* fading back as the page slides over: a black veil (opacity, compositor-only) instead of the blur filter, which on four
+   full-size layers stuttered every frame */
+.wkv.wkv-layers { filter: none; will-change: transform; }
+.wkv.wkv-layers:not(.is-blur) { transform: none; }
+.wkv.wkv-layers::after { content: ""; position: absolute; inset: 0; z-index: 2; background: #000; opacity: calc(var(--p, 0) * 0.45); pointer-events: none; will-change: opacity; }
+/* where the browser supports scroll-driven animations (Edge / Chrome), the fade-back runs on the compositor straight from the
+   scroll position — not from a script — so it can't stutter while the next slide's images load.
+   Range = the slide-up: 170svh (end of the hold, HOLD in works.js) to 270svh */
+@supports (animation-timeline: scroll()) {
+  .wkv.wkv-layers { animation: wkvBack ease-in both; animation-timeline: scroll(root); animation-range: 170svh 270svh; }
+  .wkv.wkv-layers::after { opacity: 0; animation: wkvVeil ease-in both; animation-timeline: scroll(root); animation-range: 170svh 270svh; }
+  @keyframes wkvBack { from { transform: none; } to { transform: scale(1.08); } }
+  @keyframes wkvVeil { from { opacity: 0; } to { opacity: 0.45; } }
+}
+@media (max-aspect-ratio: 1/1) { .wkv.wkv-layers, .wkv.wkv-layers::after { animation: none; } } /* portrait: no fade-back */
+.wkv-stage {
+  position: absolute; left: 50%; top: 50%; width: max(100%, 100svh * 16 / 9); aspect-ratio: 16 / 9;
+  translate: calc(-50% + var(--b) * var(--shift, 0px)) -50%; /* --shift (script): keeps the copy and the logo inside the curtains */
+  will-change: translate;
+}
+.wkv-stage > img { position: absolute; inset: 0; width: 100%; height: 100%; will-change: translate, opacity; }
+.wkv-logo { translate: calc((1 - var(--a)) * var(--lx, -9.45%)) 0; } /* --lx: artboard centre → the logo's spot on the right (page 03: 9.45%; set per page) */
+.wkv-panel { translate: calc((1 - var(--b)) * -30%) 0; opacity: var(--b); }
+.wkv-shade { opacity: var(--b); } /* panel's backdrop shade as its own layer (pages 03, 04): fades in with the panel but doesn't move or shrink */
+.wkv-top { translate: 0 calc((1 - var(--c)) * -3%); opacity: var(--c); }
+/* side margins: --gut (script) wide, up to 6vw but never so wide the copy or the logo would be cut */
+.wkv-curtain { position: absolute; top: 0; bottom: 0; width: calc(var(--gut, 0px) + 1px); background: var(--bg); z-index: 1; will-change: transform; }
+.wkv-curtain.l { left: 0; transform: translateX(calc((var(--b) - 1) * 101%)); }
+.wkv-curtain.r { right: 0; transform: translateX(calc((1 - var(--b)) * 101%)); }
+.wkv-full .wkv-curtain { display: none; } .wkv-full .wkv-stage { translate: -50% -50%; } /* pages 03, 04: the background stays full-bleed… */
+.wkv-full .wkv-stage > :is(.wkv-panel, .wkv-top, .wkv-logo) { scale: calc(1 - var(--b) * 0.1); } /* …while the objects (panel, tags, logo) draw in by 10% toward the centre — scale knob */
+.wkv-layers ~ main { margin-top: 170svh; } /* scroll room for the motion plus a hold on the finished artboard — keep in step with HOLD in works.js */
+@media (max-aspect-ratio: 1/1) { /* portrait: shown finished, no scroll motion */
+  .wkv.wkv-layers { height: auto; aspect-ratio: 16 / 9; }
+  .wkv-stage { width: 100%; translate: -50% -50%; }
+  .wkv-curtain { display: none; }
+  .wkv-layers ~ main { margin-top: 0; }
+}
+@media (prefers-reduced-motion: reduce) { .wkv-stage > img { translate: none; } }
+/* page 03: the wheel steps scene by scene — cover, finished artboard 17 (a marker in the hold), each slide centred, the video, the footer.
+   Markers (.wsnap) are invisible points in the page; 46px = the fixed top bar (scroll-padding-top), so the 17 stop lands where meant */
+@media (min-aspect-ratio: 1/1) {
+  html:has(.wkv-layers) { scroll-snap-type: y mandatory; }
+  html:has(.wkv-layers) :is(.wslide, .wvideo) { scroll-snap-align: center; }
+  html:has(.wkv-layers) .wfoot { scroll-snap-align: end; }
+  .wsnap { position: absolute; left: 0; width: 1px; height: 1px; pointer-events: none; scroll-snap-align: start; }
+}
+@media (max-aspect-ratio: 1/1) { .wsnap { display: none; } }
 /* full-width cover: sides never crop; on screens wider than the image (--ar, default 16:9) it runs past the screen and only its bottom is cut */
 .wkv.wkv-fit { height: min(100svh, calc(100vw / var(--ar, 1.7778))); object-position: top; }
 /* inset cover: full screen height, width from the image's ratio (--ar), centred with the page background either side */
@@ -430,6 +484,12 @@ html:has(.wtop-fixed) { scroll-padding-top: 46px; } /* toc jumps land below the 
   margin: 0 auto;
   padding: 48px var(--pad);
 }
+/* wide slides (pages 03, 04): out of the 1240px column, each scene sized to the screen instead */
+.wslides.wslides-wide { max-width: none; }
+/* each scene (slide / video) is sized to the screen: as big as fits below the 46px top bar with 12px to spare top and bottom,
+   so a scroll stop (centred, see .wsnap) shows exactly one scene */
+.wslides-wide > :is(.wslide, .wvideo) { width: min(100%, (100svh - 46px - 24px) * 16 / 9); margin-inline: auto; }
+.wslides-wide > * + .wvideo { margin-top: 24px; } /* slides butt together; the video keeps a gap */
 /* toc target inside a slide: sits --up (% of slide width) above the next slide, so the jump lands on the section title */
 .wslide > .wmark { position: absolute; left: 0; } /* toc target partway down a slide; top set inline as % of the slide */
 .wanchor { display: block; padding-top: 1px; margin: calc(-1 * var(--up) - 1px) 0 var(--up); } /* padding stops the two margins collapsing into each other */
@@ -506,6 +566,7 @@ html:has(.wtop-fixed) { scroll-padding-top: 46px; } /* toc jumps land below the 
   pointer-events: none;
 }
 @media (prefers-reduced-motion: reduce) { .wslides .wlayer { transform: none; } }
+/* wide slides (pages 03, 04): slower, softer reveal — longer fade/rise and a wider stagger (×1.6) */.wslides-wide .wlayer { transition: transform 0.6s cubic-bezier(0.22, 1, 0.36, 1), opacity 1.5s ease calc(var(--d, 0s) * 1.6), translate 2s cubic-bezier(0.16, 1, 0.3, 1) calc(var(--d, 0s) * 1.6); }
 
 /* ─── Reveal on scroll (as on entropy.html): background stays put, the slide content fades up, then the loose objects one by one ─── */
 /* uses the separate translate property so it stacks with the cursor transform above */

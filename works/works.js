@@ -44,13 +44,57 @@ document.querySelectorAll(".wslide").forEach(el => { el.classList.add("reveal");
 // (the cover is sticky and never leaves the screen, so this goes by scroll distance)
 const kv = document.querySelector(".wkv"), bars = document.querySelectorAll(".wtop, .wtoc");
 if (kv) {
-  const toggleBars = () => {
-    bars.forEach(el => el.classList.toggle("is-hidden", scrollY < kv.offsetHeight / 2));
-    const t = Math.min(scrollY / kv.offsetHeight, 1);
-    kv.style.setProperty("--p", (t * t).toFixed(3)); // 0 → 1 over the first screen, eased in so the blur builds up slowly at first
+  const layered = kv.classList.contains("wkv-layers"); // page 03: the cover's layers move into place first
+  const portrait = matchMedia("(max-aspect-ratio: 1/1)");
+  const MOVE = 0.9, HOLD = 1.7; // screens: layers in place by 0.9, next slide arrives after 1.7 (= .wkv-layers ~ main margin)
+  // layered cover: scroll sets a target, and the drawn progress glides after it every frame, so wheel steps don't jerk;
+  // each layer then gets its own eased slice of it (logo first, panel + frame a beat later, tags last)
+  let fTarget = 0, fNow = 0, raf = 0;
+  const ease = x => x < 0.5 ? 4 * x * x * x : 1 - (-2 * x + 2) ** 3 / 2; // easeInOutCubic
+  const slice = (f, from, to) => ease(Math.min(Math.max((f - from) / (to - from), 0), 1));
+  const paint = () => {
+    fNow += (fTarget - fNow) * 0.05; // glide knob: lower = softer, slower
+    if (Math.abs(fTarget - fNow) < 0.0005) fNow = fTarget;
+    kv.style.setProperty("--a", slice(fNow, 0, 0.7).toFixed(4));
+    kv.style.setProperty("--b", slice(fNow, 0.2, 0.95).toFixed(4));
+    kv.style.setProperty("--c", slice(fNow, 0.45, 1).toFixed(4));
+    raf = fNow === fTarget ? 0 : requestAnimationFrame(paint);
   };
+  // layered cover geometry (px, once per resize): side margin, and how far the stage shifts so that — with the curtains
+  // closed — the crop falls mostly on the right (24% of it on the left), sparing the copy and the logo
+  const geometry = () => {
+    if (!layered) return;
+    const vw = kv.clientWidth, vh = kv.clientHeight, cw = Math.max(vw, vh * 16 / 9);
+    const gut = portrait.matches ? 0 : Math.min(Math.max((vw - 1.53 * vh) / 2, 0), 0.06 * vw); // 1.53 × height = room the copy + logo need
+    const over = Math.max(cw - (vw - 2 * gut), 0);
+    kv.style.setProperty("--gut", gut.toFixed(1) + "px");
+    kv.style.setProperty("--shift", (portrait.matches ? 0 : gut - 0.24 * over - (vw - cw) / 2).toFixed(1) + "px");
+  };
+  const toggleBars = () => {
+    const H = kv.offsetHeight;
+    let y = scrollY;
+    if (layered) {
+      fTarget = portrait.matches ? 1 : Math.min(y / (H * MOVE), 1); // portrait: shown finished
+      if (!portrait.matches) y = Math.max(y - H * HOLD, 0); // the slide-up starts once the hold is over
+      if (!raf) raf = requestAnimationFrame(paint);
+    }
+    bars.forEach(el => el.classList.toggle("is-hidden", y < H / 2));
+    if (cssFade) return; // layered cover on a scroll-timeline browser: works.css fades it back on the compositor
+    const t = Math.min(y / H, 1);
+    kv.style.setProperty("--p", (t * t).toFixed(3)); // 0 → 1 over the first screen, eased in so the blur builds up slowly at first
+    kv.classList.toggle("is-blur", t > 0);
+  };
+  const cssFade = layered && CSS.supports("animation-timeline: scroll()");
   addEventListener("scroll", toggleBars, { passive: true });
+  addEventListener("resize", geometry);
+  geometry();
   toggleBars();
+  // decode the slides' big images ahead of time (idle, after load), so they don't decode mid-scroll as they come in
+  if (layered) addEventListener("load", () => {
+    const imgs = [...document.querySelectorAll(".wslides img")];
+    const next = () => { const im = imgs.shift(); if (im) im.decode().catch(() => {}).then(() => window.requestIdleCallback ? requestIdleCallback(next) : setTimeout(next, 50)); };
+    next();
+  });
 }
 
 // highlight the toc link of the section currently at mid-screen

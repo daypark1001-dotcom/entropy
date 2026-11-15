@@ -983,10 +983,10 @@ body::after {
   position: absolute;
   inset: -45px 0 0; /* 45px = divider strip above, so the image covers it too */
   opacity: 0;
-  transition: opacity 0.5s ease;
+  transition: opacity 0.35s ease; /* fade-out speed */
   pointer-events: none;
 }
-.works-hover-bg.is-on { opacity: 0.85; } /* strength knob */
+.works-hover-bg.is-on { opacity: 0.85; transition-duration: 0.9s; } /* fade-in speed */ /* strength knob */
 .works-hover-bg img { display: block; width: 100%; height: 100%; object-fit: cover; }
 .works-hover-bg video { display: block; width: 100%; height: 100%; object-fit: contain; background: #000; } /* whole frame, black either side */
 
@@ -1081,14 +1081,14 @@ div.psplit img:nth-child(2) { bottom: -1.5%; left: 4%; height: 72%; width: auto;
   height: clamp(480px, calc(100svh - 210px), 740px);
   margin: 0 calc(50% - 50vw); /* full band width, not just the 1240px column */
   overflow: hidden;
-  cursor: grab;
+  cursor: crosshair;
   user-select: none;
   touch-action: pan-y;
   /* fade cards out at the left/right edge instead of a hard clip mid-card */
   mask-image: linear-gradient(90deg, transparent, black 6%, black 94%, transparent);
   -webkit-mask-image: linear-gradient(90deg, transparent, black 6%, black 94%, transparent);
 }
-.pring.dragging { cursor: grabbing; }
+.pring.dragging { cursor: crosshair; }
 
 /* the wheel is a 0×0 point at the ring's centre, pushed down so only its top arc shows; JS sets --r and --dy.
    The spin (.pring-spin inside it) is its own layer animated by transform only, so it stays on the GPU */
@@ -1127,8 +1127,11 @@ div.psplit img:nth-child(2) { bottom: -1.5%; left: 4%; height: 72%; width: auto;
 }
 .pcard img { display: block; width: 100%; height: 100%; object-fit: cover; pointer-events: none; transition: opacity 0.4s ease; }
 /* while the hover background is up, the other cards drop to their base gradient and go see-through */
-.pring.is-bg:not(.is-open) .pcard:not(:hover) img { opacity: 0; }
-.pring.is-bg:not(.is-open) .pcard:not(:hover):not(.is-dim) { opacity: 0.35; } /* transparency knob */
+/* .is-bgcard (JS) = the card whose image is up, so the dimming follows the delayed background, not the raw cursor */
+.pring.is-bg:not(.is-open) .pcard:not(.is-bgcard) img { opacity: 0; }
+.pcard .psplit { transition: background-color 0.4s ease; }
+.pring.is-bg:not(.is-open) .pcard:not(.is-bgcard) .psplit { background-color: transparent; } /* split cards' white sheet too (Naver · Google) */
+.pring.is-bg:not(.is-open) .pcard:not(.is-bgcard):not(.is-dim) { opacity: 0.35; } /* transparency knob */
 .pcard:hover, .pcard:focus-visible { outline: 1.5px solid var(--red); outline-offset: 5px; }
 .pcard.is-dim { opacity: 0.12; pointer-events: none; }
 .pring.is-open .pcard { opacity: 0; pointer-events: none; }
@@ -1170,6 +1173,29 @@ div.psplit img:nth-child(2) { bottom: -1.5%; left: 4%; height: 72%; width: auto;
   text-transform: uppercase;
   color: var(--ink-soft);
 }
+/* drag hint: a ghost of the cursor's red dot with DRAG in it — on the ring's one-time demo (.pring-hint)
+   and on the real cursor while it's over the ring (.cursor-label) */
+.pring-hint, .cursor-label {
+  display: grid; place-items: center;
+  display: flex; gap: 14px; align-items: center;
+  color: rgba(255, 26, 26, 0.75); /* presence knob */
+  font: 500 10px/1 var(--mono);
+  letter-spacing: 0.14em;
+  white-space: nowrap;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+.pring-hint { position: absolute; left: 50%; z-index: 3; transform: translate(-50%, -50%); }
+.pring-hint.is-on { opacity: 1; }
+.cursor-label { position: fixed; top: 0; left: 0; z-index: 10002; }
+.cursor-label.is-on { opacity: 1; }
+/* arrows sway outward and back, hinting the side-to-side drag */
+.pring-hint i, .cursor-label i { font-style: normal; font-size: 22px; animation: dragNudge 1.4s ease-in-out infinite; }
+.pring-hint i:last-child, .cursor-label i:last-child { animation-name: dragNudgeR; }
+@keyframes dragNudge  { 0%, 100% { transform: translateX(0); } 50% { transform: translateX(-4px); } }
+@keyframes dragNudgeR { 0%, 100% { transform: translateX(0); } 50% { transform: translateX(4px); } }
+@media (prefers-reduced-motion: reduce) { .pring-hint i, .cursor-label i { animation: none; } }
 .pring-title {
   display: block;
   margin-top: 6px;
@@ -1220,9 +1246,9 @@ div.psplit img:nth-child(2) { bottom: -1.5%; left: 4%; height: 72%; width: auto;
     translateX(calc(max(var(--k), 0) * var(--off) + min(var(--k), 0) * var(--lw) * 0.7))    translateZ(calc(max(var(--k), 0) * -70px + min(var(--k), 0) * -80px))
     rotateY(-14deg);
   transition: transform 0.7s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.4s ease;
-  cursor: grab;
+  cursor: crosshair;
 }
-.pring.is-open .pstack.is-dragging .pstack-layer { transition: none; cursor: grabbing; } /* follow the pointer 1:1 */
+.pring.is-open .pstack.is-dragging .pstack-layer { transition: none; cursor: crosshair; } /* follow the pointer 1:1 */
 /* on open, the front card lands first and the rest fan out behind it one by one */
 .pring.is-opening .pstack-layer { transition-duration: 1s, 0.5s; transition-delay: calc(0.3s + var(--i) * 0.07s); }
 .pring.is-open .pstack-layer.is-past { pointer-events: none; }
@@ -1381,7 +1407,7 @@ div.psplit img:nth-child(2) { bottom: -1.5%; left: 4%; height: 72%; width: auto;
 <!-- ═════════ COVER ═════════ -->
 <section class="cover">
   <div class="cover-deco" aria-hidden="true">
-    <canvas class="about-dots" data-avoid=".cover-avoid" data-size="0.7"></canvas>
+    <canvas class="about-dots" data-avoid=".cover-avoid" data-size="1"></canvas>
     <div class="works-coord works-coord-tl">Cover / 00</div>
     <div class="works-coord works-coord-tr">FRAME · CVR</div>
     <div class="works-coord works-coord-bl">Δ DRAG TO SELECT</div>
@@ -1389,10 +1415,8 @@ div.psplit img:nth-child(2) { bottom: -1.5%; left: 4%; height: 72%; width: auto;
     <i class="guide-v" style="left: 3%"></i>
     <i class="guide-v" style="left: 97%"></i>
     <!-- registration marks at the middle of each edge, as on a print sheet -->
-    <i class="reg" style="top: 60px; left: 50%"></i>
-    <i class="reg" style="bottom: 60px; left: 50%"></i>
-    <i class="reg cover-reg-side" style="top: 50%; left: 60px"></i> <!-- JS lines the side pair up with the letters' middle -->
-    <i class="reg cover-reg-side" style="top: 50%; right: 60px"></i>
+    <i class="reg cover-reg-side" style="top: 50%; left: 240px"></i> <!-- JS lines the side pair up with the letters' middle -->
+    <i class="reg cover-reg-side" style="top: 50%; right: 240px"></i>
   </div>
   <div class="cover-stage">
     <div class="stage-canvas" id="stage">
@@ -2017,15 +2041,16 @@ document.querySelectorAll(".about-dots").forEach(canvas => { // About's backdrop
   let W = 0, H = 0, clusters = [], running = false, mx = -1e4, my = -1e4;
 
   const makeCluster = () => {
-    const R = (50 + Math.random() * 70) * SIZE, dots = [];
+    const R = (30 + Math.random() ** 1.5 * 150) * SIZE, dots = []; // wide spread: a few big clusters, mostly small ones
     for (let y = -R; y <= R; y += STEP) for (let x = -R; x <= R; x += STEP) {
       const d = Math.hypot(x, y) / R;
       if (d > 1) continue;
       dots.push({ ox: x, oy: y, x, y, vx: 0, vy: 0, r: 0.5 + 3 * (1 - d) ** 0.8 }); // big at the core, fine at the rim
     }
     // born along the top or bottom edge (alternating), drifting inward toward the middle
-    const top = (n++ % 2) === 0;
-    return { R, dots, cx: R + Math.random() * (W - 2 * R), cy: top ? R : H - R,
+    // each cluster gets its own slice of the width, so random luck can't pile them all on one side
+    const i = n++, top = i % 2 === 0;
+    return { R, dots, cx: R + ((i % COUNT) + Math.random()) / COUNT * (W - 2 * R), cy: top ? R : H - R,
              vx: (Math.random() - 0.5) * 0.7, vy: (top ? 1 : -1) * (0.2 + Math.random() * 0.35) };
   };
   let n = 0;
@@ -2049,7 +2074,8 @@ document.querySelectorAll(".about-dots").forEach(canvas => { // About's backdrop
     if (avoidEl) {
       const a = avoidEl.getBoundingClientRect(), o = canvas.getBoundingClientRect();
       const M = 34; // keep clear of the crop marks too
-      const L = a.left - o.left - M, T = a.top - o.top - M, Rr = a.right - o.left + M, B = a.bottom - o.top + M;
+      const k = o.width / W || 1; // the cover scales on scroll: back to canvas px
+      const L = (a.left - o.left) / k - M, T = (a.top - o.top) / k - M, Rr = (a.right - o.left) / k + M, B = (a.bottom - o.top) / k + M;
       for (const c of clusters) {
         const px = Math.min(Math.max(c.cx, L), Rr), py = Math.min(Math.max(c.cy, T), B); // nearest point on the box
         let nx = c.cx - px, ny = c.cy - py, d = Math.hypot(nx, ny);
@@ -2272,6 +2298,7 @@ boxes.forEach((box, i) => {
 /* ============================================================
    7. Custom cursor
    ============================================================ */
+const DRAG_HINT = "<i>«</i><i>»</i>"; // arrows are <i> so they can sway (CSS dragNudge)
 const cursor = document.querySelector(".cursor");
 const cursorDot = document.querySelector(".cursor-dot");
 if (cursor && window.matchMedia("(pointer:fine)").matches) {
@@ -2280,10 +2307,16 @@ if (cursor && window.matchMedia("(pointer:fine)").matches) {
   let hoverScale = 1, hoverScaleTarget = 1;
   document.addEventListener("mousemove", (e) => { mx = e.clientX; my = e.clientY; });
   // delegated, since the project ring builds its cards later
+  // over the project ring (while closed) the dot turns into a "DRAG" badge
+  const label = document.createElement("div");
+  label.className = "cursor-label"; label.innerHTML = DRAG_HINT;
+  document.body.append(label);
   document.addEventListener("mouseover", (e) => {
-    const on = !!e.target.closest(".pcard, .expertise-card");
-    hoverScaleTarget = on ? 2.6 : 1;
+    const drag = !!e.target.closest(".pring:not(.is-open)");
+    const on = drag || !!e.target.closest(".pcard, .expertise-card");
+    hoverScaleTarget = drag ? 0 : on ? 2.6 : 1; // badge replaces the dot on the ring
     cursor.style.opacity = on ? "0.35" : "1";
+    label.classList.toggle("is-on", drag);
   });
   function loop() {
     dx += (mx - dx) * 0.18;
@@ -2291,6 +2324,7 @@ if (cursor && window.matchMedia("(pointer:fine)").matches) {
     hoverScale += (hoverScaleTarget - hoverScale) * 0.2;
     cursor.style.transform = `translate(${mx}px, ${my}px) translate(-50%, -50%)`;
     cursorDot.style.transform = `translate(${dx}px, ${dy}px) translate(-50%, -50%) scale(${hoverScale})`;
+    label.style.transform = `translate(${dx}px, ${dy}px) translate(-50%, -50%)`;
     requestAnimationFrame(loop);
   }
   loop();
@@ -2422,7 +2456,7 @@ if (cursor && window.matchMedia("(pointer:fine)").matches) {
     });
     ring.classList.add("is-in", "is-landing");
     clearTimeout(landTimer);
-    landTimer = setTimeout(() => ring.classList.remove("is-landing"), 1900); // drop the delays so filter dimming stays instant
+    landTimer = setTimeout(() => { ring.classList.remove("is-landing"); runDemo(); }, 1900); // drop the delays so filter dimming stays instant
   }
   new IntersectionObserver(([e]) => {
     visible = e.isIntersecting;
@@ -2459,6 +2493,14 @@ if (cursor && window.matchMedia("(pointer:fine)").matches) {
   function showBg(c) {
     // a thumb alone stays on the card
     const src = c && (c._p.split.length ? c._p.split : c._p.images[0]);
+    // switching straight from one project's image to another: fade the old one out first instead of a hard cut
+    if (src && hoverBg._p !== c._p && hoverBg.classList.contains("is-on")) {
+      hoverBg.classList.remove("is-on");
+      bgTimer = setTimeout(() => showBg(c), 350);
+      return;
+    }
+    ring.querySelectorAll(".pcard.is-bgcard").forEach(k => k.classList.remove("is-bgcard"));
+    if (src) c.classList.add("is-bgcard");
     // rebuilt only when the project changes (mouseover repeats while moving over one card, which would restart a video);
     // kept on hover-out so it can fade
     if (src && hoverBg._p !== c._p) { hoverBg.replaceChildren(pictures(src, c._p, false)); hoverBg._p = c._p; }
@@ -2472,9 +2514,16 @@ if (cursor && window.matchMedia("(pointer:fine)").matches) {
     hoverCard = e.target.closest(".pcard");
     hovering = !!hoverCard;
     showCaption(hoverCard || topCard);
-    showBg(hoverCard);
+    bgLater(hoverCard);
   });
-  ring.addEventListener("mouseleave", () => { hovering = false; hoverCard = null; showCaption(topCard); showBg(null); });
+  ring.addEventListener("mouseleave", () => { hovering = false; hoverCard = null; showCaption(topCard); bgLater(null); });
+  // background waits until the cursor settles on a card, so sweeping across the ring doesn't flash images
+  let bgTimer = 0, bgCard;
+  function bgLater(c) {
+    if (c === bgCard) return; // mouseover repeats inside one card
+    bgCard = c; clearTimeout(bgTimer);
+    bgTimer = setTimeout(() => showBg(c), c ? 280 : 80); // delay knobs (ms): show, hide
+  }
 
   /* open: the wheel fades, the project's images fan out */
   wheel.addEventListener("click", e => {
@@ -2596,11 +2645,47 @@ if (cursor && window.matchMedia("(pointer:fine)").matches) {
     if (e.key === "ArrowLeft") go(front - 1);
   });
 
-  // slow idle spin, paused while a card is hovered, dragged, opened or off screen
+  // slow idle spin, paused while a card is hovered, dragged, opened or off screen (or the drag demo is playing)
+  let demo = false, demoDone = false;
+  // cursor near the left / right edge of the band: the wheel runs that way, faster the closer to the edge
+  let edge = 0; // -1…1
+  const EDGE = 0.18, EDGE_SPEED = 0.7; // zone (share of width per side), top speed (deg/frame) — knobs
+  ring.addEventListener("pointermove", e => {
+    if (e.pointerType !== "mouse") return;
+    const r = ring.getBoundingClientRect(), u = (e.clientX - r.left) / r.width;
+    edge = u < EDGE ? -(1 - u / EDGE) : u > 1 - EDGE ? (u - (1 - EDGE)) / EDGE : 0;
+  });
+  ring.addEventListener("pointerleave", () => edge = 0);
   (function tick() {
-    if (visible && !isOpen && !hovering && !dragging && !reduce) { rot -= 0.04; render(); }
+    if (visible && !isOpen && !dragging && !demo && edge) { rot -= edge * edge * Math.sign(edge) * EDGE_SPEED; render(); } // eased in
+    else if (visible && !isOpen && !hovering && !dragging && !reduce && !demo) { rot -= 0.04; render(); }
     requestAnimationFrame(tick);
   })();
+
+  // once per visit, after the cards land: a ghost cursor drags the ring left and right so people see it turns.
+  // Any real hover / press cancels it.
+  const hint = el("div", "pring-hint"); hint.innerHTML = DRAG_HINT;
+  ring.append(hint);
+  function runDemo() {
+    if (demoDone || reduce || isOpen || hovering || dragging || !visible) return;
+    demoDone = demo = true;
+    const base = rot, T = 2600, A = 70; // duration (ms), swing (px)
+    hint.style.top = (ring.clientWidth < 700 ? 146 : 234) / 2 + 60 + "px"; // over the top card
+    hint.classList.add("is-on");
+    const t0 = performance.now();
+    (function frame(now) {
+      const t = Math.min((now - t0) / T, 1);
+      const x = A * Math.sin(t * Math.PI * 2) * Math.sin(t * Math.PI); // right, left, back to centre
+      if (!demo) return;
+      hint.style.transform = `translate(calc(-50% + ${x}px), -50%)`;
+      rot = base + x * 180 / (Math.PI * R);
+      render();
+      if (t < 1) requestAnimationFrame(frame); else stopDemo();
+    })(t0);
+  }
+  function stopDemo() { demo = false; hint.classList.remove("is-on"); }
+  ring.addEventListener("pointerenter", stopDemo);
+  ring.addEventListener("pointerdown", stopDemo);
 
   addEventListener("resize", layout);
   layout();
